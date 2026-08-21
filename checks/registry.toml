@@ -1,0 +1,27 @@
+[[checks]]
+id = "stream_tools"
+title = "Tool names in the live stream"
+severity = "fail"
+contract = "openai-stream"
+scores_rank = true
+
+[[checks]]
+id = "nonstream_tools"
+title = "Complete tool calls without streaming"
+severity = "fail"
+contract = "openai-nonstream"
+scores_rank = true
+
+[[checks]]
+id = "cache_tools"
+title = "Tool calls after a prompt-cache hit"
+severity = "fail"
+contract = "openai-cache"
+scores_rank = true
+
+[[checks]]
+id = "usage_pricing"
+title = "Whether the response includes a price"
+severity = "info"
+contract = "observability"
+scores_rank = false
