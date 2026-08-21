@@ -268,8 +268,9 @@ h2 {
 .cell-note {
   margin: 0.4rem 0 0;
   color: var(--muted);
-  font-size: var(--text-caption);
-  max-width: 28ch;
+  font-size: var(--text-ui);
+  max-width: 42ch;
+  line-height: 1.4;
   text-wrap: pretty;
 }
 
@@ -586,6 +587,7 @@ footer {
 }
 
 @media (max-width: 720px) {
+
   h1,
   .verdict h1 {
     font-size: 1.5rem;

@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT))
 if str(_SITE) not in sys.path:
     sys.path.insert(0, str(_SITE))
 
+import cellcopy  # noqa: E402
 import mdhtml  # noqa: E402
 import rundata  # noqa: E402
 import tmpl  # noqa: E402
@@ -169,7 +170,7 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
             cell = cmap.get((alias, spec["id"])) or {}
             resolved = cell.get("resolved_model") or resolved
             status = cell.get("status") or "missing"
-            summary = cell.get("summary") or ""
+            summary = cellcopy.note({**cell, "check_id": spec["id"]})
             scoring = bool(spec.get("scores_rank"))
             data_label = html.escape(
                 f"{rundata.scoring_short(spec['id'])} · "

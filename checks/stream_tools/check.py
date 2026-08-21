@@ -35,14 +35,16 @@ def run(client: InferHubClient, alias: str) -> dict:
     if stats["empty_finish_chunks"] or stats["empty_name_chunks"]:
         bits = []
         if stats["empty_finish_chunks"]:
-            bits.append(f'{stats["empty_finish_chunks"]} chunks with finish_reason ""')
+            bits.append(
+                f'{stats["empty_finish_chunks"]} event(s) set finish_reason to ""'
+            )
         if stats["empty_name_chunks"]:
-            bits.append(f'{stats["empty_name_chunks"]} tool deltas with name ""')
+            bits.append(f'{stats["empty_name_chunks"]} tool delta(s) set name to ""')
         return result(
             check_id="stream_tools",
             alias=alias,
             status="fail",
-            summary="; ".join(bits) + ".",
+            summary="Not the OpenAI stream shape: " + "; ".join(bits) + ".",
             resolved_model=resolved,
             http_status=status,
             latency_ms=ms,
@@ -63,7 +65,7 @@ def run(client: InferHubClient, alias: str) -> dict:
         check_id="stream_tools",
         alias=alias,
         status="pass",
-        summary=f"Named tools: {', '.join(stats['names'])}.",
+        summary=f"Streamed a tool call named {', '.join(stats['names'])}.",
         resolved_model=resolved,
         http_status=status,
         latency_ms=ms,

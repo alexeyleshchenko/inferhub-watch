@@ -72,7 +72,8 @@ class WiringTests(unittest.TestCase):
         self.assertIn("<details", html)
         self.assertIn("<summary>", html)
         self.assertIn("get_weather", html)
-        self.assertIn("cached_tokens", html)
+        self.assertIn("Prompt cache hit", html)
+        self.assertIn("not part of Safe to use", html)
         self.assertIn("platform.openai.com", html)
         thead, _, after_head = html.partition("</thead>")
         self.assertNotIn("checks/stream_tools.html", thead)
@@ -122,39 +123,42 @@ class WiringTests(unittest.TestCase):
         self.assertNotIn("Safe to use:", html)
         self.assertIn("2/2: tools + cache", html)
         self.assertNotIn("Scoring ", html)
-        self.assertIn("No alias is safe to use this run.", gen.index_html(
-            [
-                {
-                    "started_at": "2026-08-21T00:00:00",
-                    "origin": "local-seed",
-                    "cells": [
-                        {
-                            "alias": "x",
-                            "check_id": "stream_tools",
-                            "status": "fail",
-                            "summary": "miss",
-                            "resolved_model": "x",
-                        },
-                        {
-                            "alias": "x",
-                            "check_id": "cache_tools",
-                            "status": "fail",
-                            "summary": "miss",
-                            "resolved_model": "x",
-                        },
-                        {
-                            "alias": "x",
-                            "check_id": "usage_pricing",
-                            "status": "info",
-                            "summary": "No price field.",
-                            "resolved_model": "x",
-                        },
-                    ],
-                }
-            ],
-            ["x"],
-            gen.load_registry(),
-        ))
+        self.assertIn(
+            "No alias is safe to use this run.",
+            gen.index_html(
+                [
+                    {
+                        "started_at": "2026-08-21T00:00:00",
+                        "origin": "local-seed",
+                        "cells": [
+                            {
+                                "alias": "x",
+                                "check_id": "stream_tools",
+                                "status": "fail",
+                                "summary": "miss",
+                                "resolved_model": "x",
+                            },
+                            {
+                                "alias": "x",
+                                "check_id": "cache_tools",
+                                "status": "fail",
+                                "summary": "miss",
+                                "resolved_model": "x",
+                            },
+                            {
+                                "alias": "x",
+                                "check_id": "usage_pricing",
+                                "status": "info",
+                                "summary": "No price field.",
+                                "resolved_model": "x",
+                            },
+                        ],
+                    }
+                ],
+                ["x"],
+                gen.load_registry(),
+            ),
+        )
         self.assertIn("check-col col-score", html)
         self.assertIn("check-col col-info", html)
         self.assertIn("info · not ranked", html)

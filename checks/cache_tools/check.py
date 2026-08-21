@@ -62,21 +62,37 @@ def run(client: InferHubClient, alias: str) -> dict:
             evidence=evidence,
         )
     if cached <= 0:
+        prompt = usage.get("prompt_tokens")
+        if prompt is not None:
+            miss = (
+                f"No prompt-cache hit after 3 tries ({prompt} input tokens, no tools). "
+                "usage.cached_tokens stayed 0."
+            )
+        else:
+            miss = (
+                "No prompt-cache hit after 3 tries (no tools). "
+                "usage.cached_tokens stayed 0."
+            )
         return result(
             check_id="cache_tools",
             alias=alias,
             status="fail",
-            summary="No cached_tokens after 3 streaming completions (no tools in the request).",
+            summary=miss,
             resolved_model=resolved,
             http_status=status,
             latency_ms=ms,
             evidence=evidence,
         )
+    prompt = usage.get("prompt_tokens")
+    if prompt is not None:
+        hit = f"Prompt cache hit: {cached} of {prompt} input tokens were reused."
+    else:
+        hit = f"Prompt cache hit: {cached} input tokens reused."
     return result(
         check_id="cache_tools",
         alias=alias,
         status="pass",
-        summary=f"Cache hit ({cached} tokens) on a streaming completion without tools.",
+        summary=hit,
         resolved_model=resolved,
         http_status=status,
         latency_ms=ms,

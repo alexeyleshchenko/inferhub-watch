@@ -66,7 +66,7 @@ class CacheToolsTests(unittest.TestCase):
         client = _Seq([_chunks(cached=0), _chunks(cached=80)])
         out = self.check.run(client, "gpt-5.6-luna")
         self.assertEqual(out["status"], "pass")
-        self.assertIn("Cache hit", out["summary"])
+        self.assertIn("Prompt cache hit", out["summary"])
         self.assertNotIn("get_weather", out["summary"])
 
     def test_miss_after_three_attempts_fails(self) -> None:
