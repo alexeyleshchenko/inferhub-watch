@@ -212,9 +212,9 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
     )
     if safe:
         rec = ", ".join(f"<code>{html.escape(a)}</code>" for a in safe)
-        line = f"{rec}. {html.escape(rule)}."
+        line = f"{rec}."
     else:
-        line = f"No alias is safe to use this run. {html.escape(rule)}."
+        line = "No alias is safe to use this run."
     recommend = (
         f'<div class="verdict"><h1>Safe to use</h1>'
         f'<p class="verdict-line">{line}</p></div>'
