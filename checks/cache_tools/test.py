@@ -47,6 +47,12 @@ class CacheToolsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.check = load_check_module("cache_tools")
+        cls._pause = cls.check.RETRY_PAUSE_S
+        cls.check.RETRY_PAUSE_S = 0
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.check.RETRY_PAUSE_S = cls._pause
 
     def test_request_has_no_tools(self) -> None:
         client = _Seq([_chunks(cached=80)])
@@ -78,6 +84,12 @@ class CacheToolsTests(unittest.TestCase):
             approx_prompt_tokens(payload["messages"][0]["content"]),
             CACHE_PREFIX_MIN_TOKENS,
         )
+
+    def test_prefix_min_tokens_and_salt(self) -> None:
+        small = cache_prefix(512, salt="threshold-test")
+        self.assertGreaterEqual(approx_prompt_tokens(small), 512)
+        self.assertLess(approx_prompt_tokens(small), CACHE_PREFIX_MIN_TOKENS)
+        self.assertIn("threshold-test", small)
 
     def test_hit_field_is_not_only_openai_cached_tokens(self) -> None:
         self.assertEqual(cached_tokens({"prompt_cache_hit_tokens": 640}), 640)

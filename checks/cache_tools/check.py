@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import hashlib
+import time
 
 from probe.http import InferHubClient
 from probe.payloads import cache_payload, cache_prefix
 from probe.result import http_preview, result
 from probe.sse import cached_tokens, last_usage, parse_sse, resolved_model
+
+# InferHub sometimes reports the write on attempt 1 and the hit only after a beat.
+RETRY_PAUSE_S = 2.0
 
 
 def run(client: InferHubClient, alias: str) -> dict:
@@ -14,7 +18,9 @@ def run(client: InferHubClient, alias: str) -> dict:
     last = None
     cached = 0
     resolved = alias
-    for _ in range(3):
+    for attempt in range(3):
+        if attempt and RETRY_PAUSE_S:
+            time.sleep(RETRY_PAUSE_S)
         status, raw, ms = client.post(cache_payload(alias, prefix))
         if status != 200:
             return result(

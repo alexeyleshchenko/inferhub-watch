@@ -43,9 +43,8 @@ def completion_payload(
 
 CACHE_USER = "Reply with the single word paris. Nothing else."
 
-# ClinePass DeepSeek Pro still wrote 0 cached_tokens at ~2k prompt tokens.
-# Step up toward Cline-sized prefixes without sending a 70k session.
-CACHE_PREFIX_MIN_TOKENS = 8192
+# ClinePass can hit cache well below this; 2k is a modest floor, not a Cline session.
+CACHE_PREFIX_MIN_TOKENS = 2048
 _CACHE_CHARS_PER_TOKEN = 4
 
 
@@ -53,16 +52,19 @@ def approx_prompt_tokens(text: str) -> int:
     return max(len(text) // _CACHE_CHARS_PER_TOKEN, len(text.split()))
 
 
-def cache_prefix() -> str:
+def cache_prefix(min_tokens: int | None = None, *, salt: str = "") -> str:
+    target = CACHE_PREFIX_MIN_TOKENS if min_tokens is None else min_tokens
     head = (
         "You are a concise assistant. Follow the user. "
         "Keep answers to one word when asked. "
         "The same instructions apply on every turn.\n"
     )
+    if salt:
+        head += f"Unique probe salt: {salt}.\n"
     line = "Cache prefix line {:04d}: keep this system text identical on every retry.\n"
     parts = [head]
     n = 1
-    while approx_prompt_tokens("".join(parts)) < CACHE_PREFIX_MIN_TOKENS:
+    while approx_prompt_tokens("".join(parts)) < target:
         parts.append(line.format(n))
         n += 1
     return "".join(parts)
