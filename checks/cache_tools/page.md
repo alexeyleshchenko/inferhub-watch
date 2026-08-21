@@ -1,6 +1,6 @@
 # Prompt cache on a streaming completion
 
-This check is **not** about tools. It sends a shared system prefix well past the usual **1024-token** provider floor (enough to write a cache block, not a 70k Cline session) and a one-word user prompt, `stream: true`, no `tools` key, three times. Public JSON stores only a hash of the prefix.
+This check is **not** about tools. It sends a shared system prefix of about **8k tokens** (past the usual 1024-token floor; not a 70k Cline session) and a one-word user prompt, `stream: true`, no `tools` key, three times. Public JSON stores only a hash of the prefix.
 
 ## Pass
 

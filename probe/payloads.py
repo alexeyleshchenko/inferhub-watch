@@ -43,9 +43,9 @@ def completion_payload(
 
 CACHE_USER = "Reply with the single word paris. Nothing else."
 
-# DeepSeek / OpenAI-style prompt cache usually ignores prefixes under ~1024 tokens.
-# Character/4 undercounts some tokenizers; require 2048 estimated so we clear the floor.
-CACHE_PREFIX_MIN_TOKENS = 2048
+# ClinePass DeepSeek Pro still wrote 0 cached_tokens at ~2k prompt tokens.
+# Step up toward Cline-sized prefixes without sending a 70k session.
+CACHE_PREFIX_MIN_TOKENS = 8192
 _CACHE_CHARS_PER_TOKEN = 4
 
 
