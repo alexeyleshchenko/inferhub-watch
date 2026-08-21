@@ -1,6 +1,7 @@
 [[checks]]
 id = "stream_tools"
 title = "Tool names in the live stream"
+blurb = "Named tools must show up in the SSE deltas; an empty finish_reason or empty name fails."
 severity = "fail"
 contract = "openai-stream"
 scores_rank = true
@@ -8,6 +9,7 @@ scores_rank = true
 [[checks]]
 id = "nonstream_tools"
 title = "Complete tool calls without streaming"
+blurb = "The buffered message must include a tool_calls list with non-empty function names."
 severity = "fail"
 contract = "openai-nonstream"
 scores_rank = true
@@ -15,6 +17,7 @@ scores_rank = true
 [[checks]]
 id = "cache_tools"
 title = "Tool calls after a prompt-cache hit"
+blurb = "A cache hit must not drop tools; a miss with named tools still passes."
 severity = "fail"
 contract = "openai-cache"
 scores_rank = true
@@ -22,6 +25,7 @@ scores_rank = true
 [[checks]]
 id = "usage_pricing"
 title = "Whether the response includes a price"
+blurb = "Records cost fields when present. Informational only: it never fails a cell or ranks an alias."
 severity = "info"
 contract = "observability"
 scores_rank = false

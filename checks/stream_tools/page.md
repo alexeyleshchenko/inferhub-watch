@@ -24,4 +24,4 @@ A non-empty but unusual `finish_reason` is stored in evidence and does not fail 
 
 InferHub (fix the stream). Any OpenAI-compatible client that follows the documented delta shape.
 
-OpenCrabs `origin/main` treats a present empty `finish_reason` as terminal (`Option::is_some()`). That is why this OpenAI violation also blanks tools in OpenCrabs. This check does **not** score OpenCrabs. If InferHub sends proper `null`s, the cell is green even if some other OpenCrabs quirk remains.
+OpenCrabs is not scored here. It may still blank tools if it treats a present empty `finish_reason` as terminal; that is a parser choice, not this cell.

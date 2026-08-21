@@ -33,7 +33,7 @@ jobs:
         env:
           PAGES_BASE: /inferhub-watch
       - name: Contract unit tests
-        run: python3 -m unittest discover -s tests -q
+        run: python3 -m unittest discover -s . -q
 
   probe:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

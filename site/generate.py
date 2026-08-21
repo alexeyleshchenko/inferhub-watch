@@ -14,7 +14,6 @@ sys.path.insert(0, str(ROOT))
 
 from probe.registry import load_aliases, load_registry  # noqa: E402
 
-SCORING = {"stream_tools", "nonstream_tools", "cache_tools"}
 GITHUB = "https://github.com/alexeyleshchenko/inferhub-watch"
 
 
@@ -103,44 +102,21 @@ def scoring_pass_count(run: dict, alias: str) -> tuple[int, int]:
     return ok, 3
 
 
-def rank_rows(runs: list[dict], aliases: list[str]) -> list[dict]:
-    recent = runs[-7:]
-    latest = runs[-1] if runs else None
-    rows = []
-    for alias in aliases:
-        rates = []
-        green_days = 0
-        for run in recent:
-            ok, total = scoring_pass_count(run, alias)
-            rates.append(ok / total)
-            if ok == total:
-                green_days += 1
-        rate = sum(rates) / len(rates) if rates else 0
-        broken = []
-        today_ok = 0
-        resolved = ""
-        if latest:
-            cmap = cell_map(latest)
-            for check_id in ("stream_tools", "nonstream_tools", "cache_tools"):
-                cell = cmap.get((alias, check_id))
-                if cell and cell.get("status") == "pass":
-                    today_ok += 1
-                elif cell:
-                    broken.append(check_id.replace("_", " "))
-                if cell and cell.get("resolved_model"):
-                    resolved = cell["resolved_model"]
-        rows.append(
-            {
-                "alias": alias,
-                "resolved": resolved,
-                "rate": rate,
-                "today": f"{today_ok}/3",
-                "broken": broken,
-                "green_days": green_days,
-            }
-        )
-    rows.sort(key=lambda r: (-r["rate"], r["alias"]))
-    return rows
+def distinct_mornings(runs: list[dict]) -> list[dict]:
+    """Keep the latest run per UTC date so a seed and an Actions rerun are one morning."""
+    by_day: dict[str, dict] = {}
+    for run in runs:
+        by_day[day_key(run)] = run
+    return [by_day[key] for key in sorted(by_day)]
+
+
+def origin_label(run: dict) -> str:
+    raw = (run.get("origin") or "").strip()
+    if raw == "github-actions":
+        return "Actions"
+    if raw.endswith("-seed") or "seed" in raw:
+        return "seed"
+    return raw or "run"
 
 
 def shell(title: str, body: str, *, crumb: str = "", nested: bool = False) -> str:
@@ -173,16 +149,14 @@ def shell(title: str, body: str, *, crumb: str = "", nested: bool = False) -> st
 <body>
   <header class="site-header">
     <a class="mark" href="{html.escape(home)}">InferHub Watch</a>
-    <p class="lede">Daily OpenAI Chat Completions probes against InferHub aliases. Fail means the wire shape missed the documented contract, not that InferHub was down.</p>
-    <p class="source"><a href="{GITHUB}">Source on GitHub</a> · how to add a check is in the README</p>
   </header>
   <main>
     {nav}
     {body}
   </main>
   <footer>
-    <p>Scoring checks are stream, non-stream, and cache. Pricing is informational. Same ops InferHub balance as OpenCrabs.</p>
-    <p><a href="{GITHUB}">alexeyleshchenko/inferhub-watch</a></p>
+    <p>Contributor: <a href="{GITHUB}">alexeyleshchenko/inferhub-watch</a>. How to add a check is in the README.</p>
+    <p>Scoring checks are stream, non-stream, and cache. Pricing is informational and never ranks. Same ops InferHub balance as OpenCrabs.</p>
   </footer>
 </body>
 </html>
@@ -200,39 +174,19 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
         return shell("InferHub Watch", body)
 
     latest = runs[-1]
-    ranks = rank_rows(runs, aliases)
-    bars = []
-    for i, row in enumerate(ranks, start=1):
-        pct = round(row["rate"] * 100)
-        bars.append(
-            f"""<div class="rank-row">
-              <span class="rank-n">{i:02d}</span>
-              <div class="rank-meta">
-                <strong>{html.escape(row['alias'])}</strong>
-                <span class="pub">{html.escape(row['resolved'] or '—')}</span>
-              </div>
-              <div class="bar" aria-label="{pct} percent pass over last seven days">
-                <span style="width:{pct}%"></span>
-              </div>
-              <span class="pct">{pct}%</span>
-            </div>"""
-        )
-    rank_table = []
-    for i, row in enumerate(ranks, start=1):
-        broken = ", ".join(row["broken"]) if row["broken"] else "none"
-        rank_table.append(
-            f"<tr><td>{i}</td><td>{html.escape(row['alias'])}</td>"
-            f"<td>{html.escape(row['today'])}</td>"
-            f"<td>{html.escape(broken)}</td>"
-            f"<td>{row['green_days']}</td></tr>"
-        )
+    mornings = distinct_mornings(runs)
+    window = mornings[-7:]
+    n_mornings = len(window)
 
-    days = runs[-21:]
-    grid_head = "".join(f"<th>{html.escape(day_key(r)[5:])}</th>" for r in days)
+    grid_head = []
+    for run in window:
+        day = html.escape(day_key(run)[5:])
+        label = origin_label(run)
+        grid_head.append(f"<th>{day}<span class=\"origin\">{html.escape(label)}</span></th>")
     grid_rows = []
     for alias in aliases:
         cells = []
-        for run in days:
+        for run in window:
             ok, total = scoring_pass_count(run, alias)
             cls = "ok" if ok == total else ("mid" if ok else "bad")
             cells.append(f'<td class="{cls}">{ok}/{total}</td>')
@@ -242,11 +196,16 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
     check_heads = []
     for spec in registry:
         href = f"checks/{spec['id']}.html"
-        check_heads.append(f"<th><a href=\"{html.escape(href)}\">{html.escape(spec['title'])}</a></th>")
+        check_heads.append(
+            f'<th class="check-col"><a href="{html.escape(href)}">'
+            f"{html.escape(spec['title'])}</a></th>"
+        )
     matrix_rows = []
+    broken_bits = []
     for alias in aliases:
         tds = [f"<th>{html.escape(alias)}</th>"]
         resolved = ""
+        failed_titles = []
         for spec in registry:
             cell = cmap.get((alias, spec["id"])) or {}
             resolved = cell.get("resolved_model") or resolved
@@ -257,47 +216,74 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
                 f'<span class="pill">{html.escape(status)}</span>'
                 f'<p>{html.escape(summary)}</p></td>'
             )
+            if spec.get("scores_rank") and status in ("fail", "error"):
+                failed_titles.append(spec["title"])
         tds.insert(1, f"<td class=\"pub\">{html.escape(resolved or '—')}</td>")
         matrix_rows.append(f"<tr>{''.join(tds)}</tr>")
+        if failed_titles:
+            broken_bits.append(
+                f"<li><code>{html.escape(alias)}</code> — {html.escape(', '.join(failed_titles))}</li>"
+            )
 
     explainers = []
     for spec in registry:
+        blurb = html.escape(spec.get("blurb") or "")
         explainers.append(
-            f'<li><a href="checks/{html.escape(spec["id"])}.html">{html.escape(spec["title"])}</a></li>'
+            f'<li><a href="checks/{html.escape(spec["id"])}.html">{html.escape(spec["title"])}</a>'
+            f"<p>{blurb}</p></li>"
         )
 
     started = html.escape((latest.get("started_at") or "")[:19].replace("T", " ") + " UTC")
-    origin = html.escape(latest.get("origin") or "")
+    origin = html.escape(origin_label(latest))
+    if n_mornings < 7:
+        hero_window = (
+            f"Treat <strong>Today</strong> as the source of truth until this page has "
+            f"seven distinct UTC dates ({n_mornings} so far)."
+        )
+        window_caption = (
+            f"Each cell is how many of the three scoring checks passed that UTC morning. "
+            f"{n_mornings} morning{'s' if n_mornings != 1 else ''}, not 7. "
+            f"Same-UTC-day reruns collapse to the later file."
+        )
+    else:
+        hero_window = (
+            "Today is the latest morning. The grid below is the last seven distinct UTC dates."
+        )
+        window_caption = (
+            "Each cell is how many of the three scoring checks passed that UTC morning. "
+            "Last 7 distinct mornings."
+        )
+    broken_block = ""
+    if broken_bits:
+        broken_block = (
+            "<p class=\"broken-label\">Broken today (same names as the columns):</p>"
+            f"<ul class=\"broken\">{''.join(broken_bits)}</ul>"
+        )
     body = f"""
     <section class="hero">
       <p class="kicker">Last run {started} · {origin}</p>
-      <h1>Which alias works better</h1>
-      <p>Seven-day pass rate on the three scoring checks. Pricing never ranks.</p>
-    </section>
-    <section class="ranking">
-      {''.join(bars)}
-      <table class="rank-table">
-        <thead><tr><th>#</th><th>Alias</th><th>Today</th><th>Broken today</th><th>Fully green days (of last 7)</th></tr></thead>
-        <tbody>{''.join(rank_table)}</tbody>
-      </table>
-    </section>
-    <section>
-      <h2>Stability</h2>
-      <p>Each cell is how many of the three scoring checks passed that morning.</p>
-      <div class="scroll">
-        <table class="grid">
-          <thead><tr><th></th>{grid_head}</tr></thead>
-          <tbody>{''.join(grid_rows)}</tbody>
-        </table>
-      </div>
+      <h1>For people sending <code>tools</code> to <a href="https://inferhub.dev/">InferHub</a> <code>/v1/chat/completions</code>.</h1>
+      <p>Green means that morning’s JSON matched the documented OpenAI Chat Completions shape for the check. OpenCrabs is not scored.</p>
+      <p>{hero_window}</p>
     </section>
     <section>
       <h2>Today</h2>
-      <p>Resolved publisher is who InferHub actually routed. Same alias can change prefix between days.</p>
+      <p>The alias is what we request; the resolved publisher is the <code>cb/</code>, <code>cp/</code>, or <code>cmc/</code> prefix InferHub returned.</p>
+      {broken_block}
       <div class="scroll">
         <table class="matrix">
           <thead><tr><th>Alias</th><th>Resolved</th>{''.join(check_heads)}</tr></thead>
           <tbody>{''.join(matrix_rows)}</tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <h2>Mornings</h2>
+      <p>{window_caption}</p>
+      <div class="scroll">
+        <table class="grid">
+          <thead><tr><th></th>{''.join(grid_head)}</tr></thead>
+          <tbody>{''.join(grid_rows)}</tbody>
         </table>
       </div>
     </section>
@@ -312,13 +298,7 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
 def check_page(spec: dict) -> str:
     md = (ROOT / "checks" / spec["id"] / "page.md").read_text()
     article = md_to_html(md)
-    extra = ""
-    if spec["id"] == "stream_tools":
-        extra = (
-            "<p class=\"note\">OpenCrabs may still blank tools if it treats "
-            "an empty finish_reason as present. That parser is not this score.</p>"
-        )
-    body = f"<article class=\"explainer\">{article}{extra}</article>"
+    body = f"<article class=\"explainer\">{article}</article>"
     return shell(spec["title"], body, crumb=spec["title"], nested=True)
 
 
