@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from probe.registry import load_aliases, load_registry  # noqa: E402
+from probe.publishers import publisher_label  # noqa: E402
 
 GITHUB = "https://github.com/alexeyleshchenko/inferhub-watch"
 
@@ -27,6 +28,7 @@ def md_to_html(text: str) -> str:
     out: list[str] = []
     para: list[str] = []
     list_items: list[str] = []
+    fence: list[str] | None = None
 
     def flush_para() -> None:
         nonlocal para
@@ -44,6 +46,19 @@ def md_to_html(text: str) -> str:
 
     for line in lines:
         stripped = line.strip()
+        if fence is not None:
+            if stripped.startswith("```"):
+                code = html.escape("\n".join(fence))
+                out.append(f"<pre><code>{code}</code></pre>")
+                fence = None
+            else:
+                fence.append(line)
+            continue
+        if stripped.startswith("```"):
+            flush_para()
+            flush_list()
+            fence = []
+            continue
         if not stripped:
             flush_para()
             flush_list()
@@ -65,6 +80,8 @@ def md_to_html(text: str) -> str:
         para.append(stripped)
     flush_para()
     flush_list()
+    if fence is not None:
+        out.append(f"<pre><code>{html.escape(chr(10).join(fence))}</code></pre>")
     return "\n".join(out)
 
 
@@ -72,6 +89,11 @@ def inline(text: str) -> str:
     text = html.escape(text)
     text = re.sub(r"`([^`]+)`", r"<code>\1</code>", text)
     text = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(
+        r"\[([^\]]+)\]\((https?://[^)]+)\)",
+        r'<a href="\2">\1</a>',
+        text,
+    )
     return text
 
 
@@ -92,14 +114,18 @@ def cell_map(run: dict) -> dict[tuple[str, str], dict]:
     return {(c["alias"], c["check_id"]): c for c in run.get("cells") or []}
 
 
-def scoring_pass_count(run: dict, alias: str) -> tuple[int, int]:
+def scoring_ids(registry: list[dict]) -> list[str]:
+    return [spec["id"] for spec in registry if spec.get("scores_rank")]
+
+
+def scoring_pass_count(run: dict, alias: str, check_ids: list[str]) -> tuple[int, int]:
     cmap = cell_map(run)
     ok = 0
-    for check_id in ("stream_tools", "nonstream_tools", "cache_tools"):
+    for check_id in check_ids:
         cell = cmap.get((alias, check_id))
         if cell and cell.get("status") == "pass":
             ok += 1
-    return ok, 3
+    return ok, len(check_ids)
 
 
 def distinct_mornings(runs: list[dict]) -> list[dict]:
@@ -119,7 +145,15 @@ def origin_label(run: dict) -> str:
     return raw or "run"
 
 
-def shell(title: str, body: str, *, crumb: str = "", nested: bool = False) -> str:
+def shell(
+    title: str,
+    body: str,
+    *,
+    crumb: str = "",
+    nested: bool = False,
+    masthead: str = "",
+    page_class: str = "",
+) -> str:
     base = base_href()
     if base:
         home = f"{base}/"
@@ -135,6 +169,11 @@ def shell(title: str, body: str, *, crumb: str = "", nested: bool = False) -> st
         if crumb
         else ""
     )
+    cls = f' class="{html.escape(page_class)}"' if page_class else ""
+    fonts = (
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500"
+        "&family=Newsreader:ital,opsz,wght@0,8..72,400;0,8..72,600;1,8..72,400&display=swap"
+    )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -143,20 +182,21 @@ def shell(title: str, body: str, *, crumb: str = "", nested: bool = False) -> st
   <title>{html.escape(title)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="{fonts}" rel="stylesheet">
   <link rel="stylesheet" href="{html.escape(css)}">
 </head>
-<body>
+<body{cls}>
   <header class="site-header">
     <a class="mark" href="{html.escape(home)}">InferHub Watch</a>
+    {masthead}
   </header>
   <main>
     {nav}
     {body}
   </main>
   <footer>
-    <p>Contributor: <a href="{GITHUB}">alexeyleshchenko/inferhub-watch</a>. How to add a check is in the README.</p>
-    <p>Scoring checks are stream, non-stream, and cache. Pricing is informational and never ranks. Same ops InferHub balance as OpenCrabs.</p>
+    <p>Clone <a href="{GITHUB}">alexeyleshchenko/inferhub-watch</a>, set <code>INFERHUB_API_KEY</code>, run <code>python3 -m probe.run</code>. How to add a check or alias is in the README (open a GitHub issue to propose a new alias).</p>
+    <p>Scoring checks are stream and cache. Pricing is informational and never ranks. A pass is only that check. Probes run from GitHub Actions on the site owner’s InferHub key.</p>
   </footer>
 </body>
 </html>
@@ -182,12 +222,15 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
     for run in window:
         day = html.escape(day_key(run)[5:])
         label = origin_label(run)
-        grid_head.append(f"<th>{day}<span class=\"origin\">{html.escape(label)}</span></th>")
+        grid_head.append(
+            f'<th>{day}<span class="origin">{html.escape(label)}</span></th>'
+        )
+    score_ids = scoring_ids(registry)
     grid_rows = []
     for alias in aliases:
         cells = []
         for run in window:
-            ok, total = scoring_pass_count(run, alias)
+            ok, total = scoring_pass_count(run, alias, score_ids)
             cls = "ok" if ok == total else ("mid" if ok else "bad")
             cells.append(f'<td class="{cls}">{ok}/{total}</td>')
         grid_rows.append(f"<tr><th>{html.escape(alias)}</th>{''.join(cells)}</tr>")
@@ -201,6 +244,7 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
             f"{html.escape(spec['title'])}</a></th>"
         )
     matrix_rows = []
+    safe = []
     broken_bits = []
     for alias in aliases:
         tds = [f"<th>{html.escape(alias)}</th>"]
@@ -214,12 +258,16 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
             tds.append(
                 f'<td class="st-{html.escape(status)}">'
                 f'<span class="pill">{html.escape(status)}</span>'
-                f'<p>{html.escape(summary)}</p></td>'
+                f"<p>{html.escape(summary)}</p></td>"
             )
             if spec.get("scores_rank") and status in ("fail", "error"):
                 failed_titles.append(spec["title"])
-        tds.insert(1, f"<td class=\"pub\">{html.escape(resolved or '—')}</td>")
+        label = publisher_label(resolved)
+        tds.insert(1, f'<td class="pub">{html.escape(label)}</td>')
         matrix_rows.append(f"<tr>{''.join(tds)}</tr>")
+        ok, total = scoring_pass_count(latest, alias, score_ids)
+        if total and ok == total:
+            safe.append(alias)
         if failed_titles:
             broken_bits.append(
                 f"<li><code>{html.escape(alias)}</code> — {html.escape(', '.join(failed_titles))}</li>"
@@ -233,73 +281,80 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
             f"<p>{blurb}</p></li>"
         )
 
-    started = html.escape((latest.get("started_at") or "")[:19].replace("T", " ") + " UTC")
+    started = html.escape(
+        (latest.get("started_at") or "")[:19].replace("T", " ") + " UTC"
+    )
     origin = html.escape(origin_label(latest))
-    if n_mornings < 7:
-        hero_window = (
-            f"Treat <strong>Today</strong> as the source of truth until this page has "
-            f"seven distinct UTC dates ({n_mornings} so far)."
-        )
-        window_caption = (
-            f"Each cell is how many of the three scoring checks passed that UTC morning. "
-            f"{n_mornings} morning{'s' if n_mornings != 1 else ''}, not 7. "
-            f"Same-UTC-day reruns collapse to the later file."
+    masthead = (
+        f'<p class="dispatch-meta"><time datetime="{html.escape((latest.get("started_at") or "")[:19])}">'
+        f"{started}</time> · {origin}</p>"
+    )
+    n_score = len(score_ids) or 1
+    if safe:
+        rec = ", ".join(f"<code>{html.escape(a)}</code>" for a in safe)
+        recommend = (
+            f"<p>Scoring {n_score}/{n_score} today: {rec}. "
+            f"A pass is only that check, not a full SDK suite.</p>"
         )
     else:
-        hero_window = (
-            "Today is the latest morning. The grid below is the last seven distinct UTC dates."
-        )
-        window_caption = (
-            "Each cell is how many of the three scoring checks passed that UTC morning. "
-            "Last 7 distinct mornings."
-        )
-    broken_block = ""
+        recommend = "<p>No alias passed every scoring check this morning.</p>"
+    broken_after = ""
     if broken_bits:
-        broken_block = (
-            "<p class=\"broken-label\">Broken today (same names as the columns):</p>"
-            f"<ul class=\"broken\">{''.join(broken_bits)}</ul>"
+        broken_after = (
+            '<p class="broken-label">Failed scoring checks:</p>'
+            f'<ul class="broken">{"".join(broken_bits)}</ul>'
         )
+    mornings_section = ""
+    if n_mornings >= 2:
+        mornings_section = f"""
+    <section>
+      <h2>Mornings</h2>
+      <p>Each cell is how many of the {n_score} scoring checks passed that UTC morning.
+      Same-UTC-day reruns collapse to the later file.</p>
+      <div class="scroll">
+        <table class="grid">
+          <thead><tr><th></th>{"".join(grid_head)}</tr></thead>
+          <tbody>{"".join(grid_rows)}</tbody>
+        </table>
+      </div>
+    </section>
+        """
     body = f"""
     <section class="hero">
-      <p class="kicker">Last run {started} · {origin}</p>
-      <h1>For people sending <code>tools</code> to <a href="https://inferhub.dev/">InferHub</a> <code>/v1/chat/completions</code>.</h1>
-      <p>Green means that morning’s JSON matched the documented OpenAI Chat Completions shape for the check. OpenCrabs is not scored.</p>
-      <p>{hero_window}</p>
+      <h1>Daily probe of <a href="https://inferhub.dev/">InferHub</a> <code>/v1/chat/completions</code> streaming shapes.</h1>
+      <p>Each cell is one check against that morning’s JSON — not uptime, not your traffic.
+      <strong>Pass</strong> means the payload matched what that check documents.
+      <strong>Info</strong> never fails a cell. Today’s checks: streaming tool names, prompt cache on a completion with no tools, and price fields.</p>
     </section>
     <section>
       <h2>Today</h2>
-      <p>The alias is what we request; the resolved publisher is the <code>cb/</code>, <code>cp/</code>, or <code>cmc/</code> prefix InferHub returned.</p>
-      {broken_block}
+      {recommend}
+      <p>We send the <strong>alias</strong> in <code>model</code>. We do not know if you can pin the resolved id.
+      <strong>Resolved</strong> is who InferHub actually served (full id; known families from InferHub’s market table).</p>
       <div class="scroll">
         <table class="matrix">
-          <thead><tr><th>Alias</th><th>Resolved</th>{''.join(check_heads)}</tr></thead>
-          <tbody>{''.join(matrix_rows)}</tbody>
+          <thead><tr><th>Alias</th><th>Resolved</th>{"".join(check_heads)}</tr></thead>
+          <tbody>{"".join(matrix_rows)}</tbody>
         </table>
       </div>
-    </section>
-    <section>
-      <h2>Mornings</h2>
-      <p>{window_caption}</p>
-      <div class="scroll">
-        <table class="grid">
-          <thead><tr><th></th>{''.join(grid_head)}</tr></thead>
-          <tbody>{''.join(grid_rows)}</tbody>
-        </table>
-      </div>
+      {broken_after}
     </section>
     <section>
       <h2>What each check means</h2>
-      <ul class="explainers">{''.join(explainers)}</ul>
+      <ul class="explainers">{"".join(explainers)}</ul>
     </section>
+    {mornings_section}
     """
-    return shell("InferHub Watch", body)
+    return shell("InferHub Watch", body, masthead=masthead, page_class="board")
 
 
 def check_page(spec: dict) -> str:
     md = (ROOT / "checks" / spec["id"] / "page.md").read_text()
     article = md_to_html(md)
-    body = f"<article class=\"explainer\">{article}</article>"
-    return shell(spec["title"], body, crumb=spec["title"], nested=True)
+    body = f'<article class="explainer">{article}</article>'
+    return shell(
+        spec["title"], body, crumb=spec["title"], nested=True, page_class="brief"
+    )
 
 
 def main() -> int:

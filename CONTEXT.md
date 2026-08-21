@@ -9,17 +9,17 @@ The short model name we request (`gpt-5.6-luna`).
 _Avoid_: “model” alone when the publisher prefix matters.
 
 **Resolved publisher**:
-The `model` string InferHub returns (`cb/gpt-5.6-luna`). That is who served the call.
+The `model` string InferHub returns, shown with a family label when InferHub’s market table names it (`ClinePass · cp/cline-pass/…`).
 
 **Check**:
 One registered experiment: `checks/<id>/check.py` plus `checks/<id>/page.md`.
 
 **Pass / fail**:
-Whether InferHub matched the OpenAI Chat Completions shape that check documents.
-_Avoid_: “InferHub is down”, “OpenCrabs is broken”, scoring OpenCrabs’ parser.
+Whether InferHub matched the shape that check documents.
+_Avoid_: “InferHub is down.”
 
 **Info**:
 Recorded, never fails the suite (`usage_pricing`).
 
 **Scoring checks**:
-`stream_tools`, `nonstream_tools`, and `cache_tools`. These rank aliases. Pricing does not.
+`stream_tools` (streaming tool names) and `cache_tools` (prompt cache on a streaming completion **without** tools). Pricing does not score.

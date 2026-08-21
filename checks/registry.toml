@@ -7,17 +7,9 @@ contract = "openai-stream"
 scores_rank = true
 
 [[checks]]
-id = "nonstream_tools"
-title = "Complete tool calls without streaming"
-blurb = "The buffered message must include a tool_calls list with non-empty function names."
-severity = "fail"
-contract = "openai-nonstream"
-scores_rank = true
-
-[[checks]]
 id = "cache_tools"
-title = "Tool calls after a prompt-cache hit"
-blurb = "A cache hit must not drop tools; a miss with named tools still passes."
+title = "Prompt cache on a streaming completion"
+blurb = "A long prefix is sent three times with no tools. Fail if InferHub never reports cached tokens."
 severity = "fail"
 contract = "openai-cache"
 scores_rank = true

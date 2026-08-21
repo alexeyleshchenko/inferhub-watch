@@ -45,6 +45,14 @@ def resolved_model(chunks: list[dict[str, Any]], fallback: str = "") -> str:
     return fallback
 
 
+def last_usage(chunks: list[dict[str, Any]]) -> dict[str, Any]:
+    for chunk in reversed(chunks):
+        usage = chunk.get("usage")
+        if isinstance(usage, dict) and usage:
+            return usage
+    return {}
+
+
 def inspect_stream(chunks: list[dict[str, Any]]) -> dict[str, Any]:
     """OpenAI streaming contract only. Empty strings on finish_reason or name fail."""
     empty_names = 0

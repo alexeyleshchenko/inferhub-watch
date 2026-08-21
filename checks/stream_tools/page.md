@@ -2,9 +2,39 @@
 
 InferHub advertises an OpenAI-compatible `/v1/chat/completions` stream. This check asks whether a **streaming** tool-call response matches that convention.
 
+OpenAI documents streaming chat completions and tool-call deltas here: [Chat Completions streaming](https://platform.openai.com/docs/api-reference/chat/streaming) and [function calling](https://platform.openai.com/docs/guides/function-calling).
+
 ## What we send
 
-A required `get_weather` tool call, `stream: true`. We do **not** send `max_tokens`; some InferHub routes reject it.
+`stream: true`, `tool_choice: required`, one `get_weather` tool. We do **not** send `max_tokens`; some InferHub routes reject it. We request the **alias** in `model`; InferHub may return a different `model` string.
+
+```json
+{
+  "model": "<alias>",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Call get_weather for Paris. Do not answer in text. Use the tool."
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a city",
+        "parameters": {
+          "type": "object",
+          "properties": {"city": {"type": "string"}},
+          "required": ["city"]
+        }
+      }
+    }
+  ],
+  "tool_choice": "required",
+  "stream": true
+}
+```
 
 ## Pass
 
@@ -18,10 +48,8 @@ Any of:
 - a tool delta with `"name": ""`
 - a required tool call with no non-empty name by the end of the stream
 
-A non-empty but unusual `finish_reason` is stored in evidence and does not fail v1.
+A non-empty but unusual `finish_reason` is stored in evidence and does not fail this check.
 
 ## Who should care
 
-InferHub (fix the stream). Any OpenAI-compatible client that follows the documented delta shape.
-
-OpenCrabs is not scored here. It may still blank tools if it treats a present empty `finish_reason` as terminal; that is a parser choice, not this cell.
+You, if your client reads `tool_calls` from the SSE stream. A **pass** here is only this check. Truncation, JSON schema, parallel tools, and other SDK behavior are out of scope.

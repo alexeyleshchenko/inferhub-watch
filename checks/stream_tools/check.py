@@ -1,19 +1,13 @@
 from __future__ import annotations
 
 from probe.http import InferHubClient
-from probe.payloads import SINGLE_USER, TOOLS
+from probe.payloads import completion_payload
 from probe.result import result
 from probe.sse import inspect_stream, parse_sse, resolved_model
 
 
 def run(client: InferHubClient, alias: str) -> dict:
-    payload = {
-        "model": alias,
-        "messages": [{"role": "user", "content": SINGLE_USER}],
-        "tools": TOOLS,
-        "tool_choice": "required",
-        "stream": True,
-    }
+    payload = completion_payload(alias, stream=True)
     status, raw, ms = client.post(payload)
     if status != 200:
         return result(

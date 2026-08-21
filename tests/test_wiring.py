@@ -38,8 +38,9 @@ class WiringTests(unittest.TestCase):
         self.assertIn("stream: true", html)
         self.assertIn("get_weather", html)
         self.assertLessEqual(html.lower().count("is_some"), 1)
-        self.assertNotIn("INFERHUB_API_KEY", html)
         self.assertNotIn(os.environ.get("INFERHUB_API_KEY") or "sk-never", html)
+        self.assertNotIn("OpenCrabs", html)
+        self.assertIn("platform.openai.com", html)
 
     def test_homepage_puts_github_in_footer_not_header(self) -> None:
         gen = _load_generate()
@@ -48,14 +49,17 @@ class WiringTests(unittest.TestCase):
         footer = rest[rest.rfind("<footer>") :] if "<footer>" in rest else ""
         self.assertNotIn("github.com/alexeyleshchenko/inferhub-watch", header)
         self.assertIn("github.com/alexeyleshchenko/inferhub-watch", footer)
-        self.assertNotIn("INFERHUB_API_KEY", html)
+        self.assertIn("INFERHUB_API_KEY", footer)
+        self.assertNotIn(os.environ.get("INFERHUB_API_KEY") or "sk-never", html)
         self.assertIn('class="matrix"', html)
         self.assertNotIn('class="rank-table"', html)
-        self.assertIn("class=\"check-col\"", html)
+        self.assertIn('class="check-col"', html)
+        self.assertNotIn("OpenCrabs", html)
+        self.assertNotIn("Seven-day", html)
+        self.assertIn("Prompt cache", html)
         mornings = gen.distinct_mornings(gen.load_runs())
-        if len(mornings) < 7:
-            self.assertNotIn("Seven-day", html)
-            self.assertIn(f"{len(mornings)} morning", html)
+        if len(mornings) < 2:
+            self.assertNotIn("<h2>Mornings</h2>", html)
 
 
 if __name__ == "__main__":

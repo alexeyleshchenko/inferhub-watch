@@ -1,11 +1,11 @@
 # Whether the response includes a price
 
-InferHub is a marketplace. Some publishers attach `usage.cost`, `market_cost`, `credit`; others return token counts only. This check never fails the suite.
+InferHub bills consumers in USDC. This check never fails. It copies whatever price-shaped fields appear on the **streaming** usage payload.
 
 ## What we record
 
-Whatever price-shaped fields appear on a non-stream tool call, or `tokens_only` if none do.
+`cost`, `market_cost`, `gateway_cost`, and/or `credit` when present, otherwise `tokens_only`. Those fields are **not** treated as one unit: some routes send `credit`, others send `cost*`. We do not convert them.
 
 ## Who should care
 
-Anyone comparing InferHub invoices to token counters. Same alias can price differently when the resolved publisher changes.
+Anyone comparing an InferHub invoice to `usage` on the wire. The same alias can price differently when the resolved publisher changes.
