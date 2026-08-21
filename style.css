@@ -311,7 +311,7 @@ h2 {
 .explanations h3 {
   font-size: var(--text-body);
   font-weight: 500;
-  color: var(--ink);
+  color: var(--primary);
   margin: var(--space-6) 0 var(--space-3);
 }
 
@@ -475,8 +475,117 @@ td {
   background: var(--fail);
 }
 
+/* ── History timeline (Gatus-style thin bars) ── */
+
+.timeline {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-caption);
+  font-family: var(--mono);
+}
+
+.timeline caption {
+  caption-side: bottom;
+  text-align: left;
+  color: var(--muted);
+  font-size: var(--text-caption);
+  padding: var(--space-3) 0 var(--space-2);
+  text-wrap: pretty;
+}
+
+.timeline thead th {
+  height: 0;
+  padding: 0;
+  border: 0;
+  line-height: 0;
+}
+
+.timeline tbody th {
+  font-weight: 500;
+  padding: 0.5rem 0.7rem 0.5rem 0;
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.timeline td {
+  padding: 0 1px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--line);
+  cursor: default;
+  position: relative;
+}
+
+.timeline td::after {
+  content: "";
+  display: inline-block;
+  width: 100%;
+  height: 24px;
+  border-radius: 2px;
+  vertical-align: middle;
+  transition: background 180ms var(--ease);
+}
+
+@media (min-width: 640px) {
+  .timeline td::after {
+    height: 32px;
+  }
+}
+
+.timeline td.ok::after  { background: var(--ok); }
+.timeline td.mid::after { background: var(--mid); }
+.timeline td.bad::after { background: var(--fail); }
+
+.timeline tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 .scroll {
   overflow-x: auto;
+}
+
+/* ── Mobile: timeline stays as a table (no card collapse) ── */
+
+@media (max-width: 720px) {
+  .timeline {
+    display: table;
+    border-collapse: collapse;
+  }
+  .timeline thead {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    border: 0;
+  }
+  .timeline tbody,
+  .timeline tr,
+  .timeline th,
+  .timeline td {
+    display: revert;
+    width: auto;
+    max-width: none;
+  }
+  .timeline tbody tr {
+    margin: 0;
+    padding: 0;
+    border-bottom: 0;
+  }
+  .timeline tbody th {
+    padding: 0.5rem 0.7rem 0.5rem 0;
+    background: transparent;
+  }
+  .timeline td {
+    padding: 0 1px;
+  }
+  .timeline td::before {
+    content: none;
+  }
 }
 
 .matrix thead .check-col {
