@@ -82,35 +82,6 @@ def inspect_stream(chunks: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def summarize_nonstream(raw: str) -> dict[str, Any]:
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        return {"error": "non-json", "preview": raw[:240].replace("\n", " ")}
-    if "error" in data:
-        err = data["error"]
-        if isinstance(err, dict):
-            return {"error": err.get("message") or str(err)}
-        return {"error": str(err)}
-    choices = data.get("choices") or []
-    if not choices:
-        return {"error": "no choices"}
-    msg = choices[0].get("message") or {}
-    tcs = msg.get("tool_calls") or []
-    names = []
-    for tc in tcs:
-        func = tc.get("function") or {}
-        names.append(func.get("name") or "")
-    return {
-        "resolved_model": data.get("model") or "",
-        "finish_reason": choices[0].get("finish_reason"),
-        "tool_count": len(tcs),
-        "names": names,
-        "blank_names": sum(1 for n in names if not n),
-        "usage": data.get("usage") or {},
-    }
-
-
 def usage_pricing_fields(usage: dict[str, Any]) -> dict[str, Any]:
     keys = (
         "cost",
@@ -130,3 +101,7 @@ def usage_pricing_fields(usage: dict[str, Any]) -> dict[str, Any]:
     if isinstance(details, dict) and details.get("cached_tokens") is not None:
         out["cached_tokens"] = details.get("cached_tokens")
     return out
+
+
+def cached_tokens(usage: dict[str, Any]) -> int:
+    return int(usage_pricing_fields(usage).get("cached_tokens") or 0)

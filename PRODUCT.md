@@ -32,10 +32,12 @@ This is not an OpenCrabs changelog or parser bug tracker.
 
 ## Design Principles
 
-Today is the job; history is every committed probe, including same-UTC-day reruns.
+Latest results, past runs, then how we test — three containers, nothing else on the board.
 Fail is a contract miss on the wire, never a status-page outage.
-The alias is the request; the provider sits under it, not in a second column.
-Explanations recede. Verdicts and tables do not.
+The alias is the request; the publisher sits under it, not in a second column.
+Safe to use is the board headline: aliases that passed both scoring checks (tools + cache). Fail rows sit below.
+Price is info; it never ranks and must not share pass/fail pill chrome.
+How we test recedes. Verdicts and tables do not.
 Prompt cache is scored on an ordinary streaming completion, not on tools.
 Write for InferHub API callers; OpenCrabs is not on the site.
 

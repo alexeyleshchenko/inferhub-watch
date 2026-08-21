@@ -4,15 +4,8 @@ import hashlib
 
 from probe.http import InferHubClient
 from probe.payloads import cache_payload, cache_prefix
-from probe.result import result
-from probe.sse import last_usage, parse_sse, resolved_model
-
-
-def _cached_tokens(usage: dict) -> int:
-    details = usage.get("prompt_tokens_details") or {}
-    if isinstance(details, dict) and details.get("cached_tokens") is not None:
-        return int(details["cached_tokens"] or 0)
-    return int(usage.get("cached_tokens") or 0)
+from probe.result import http_preview, result
+from probe.sse import cached_tokens, last_usage, parse_sse, resolved_model
 
 
 def run(client: InferHubClient, alias: str) -> dict:
@@ -28,7 +21,7 @@ def run(client: InferHubClient, alias: str) -> dict:
                 check_id="cache_tools",
                 alias=alias,
                 status="error",
-                summary=f"HTTP {status}: {raw[:180].replace(chr(10), ' ')}",
+                summary=http_preview(status, raw),
                 resolved_model=resolved,
                 http_status=status,
                 latency_ms=ms,
@@ -37,7 +30,7 @@ def run(client: InferHubClient, alias: str) -> dict:
         chunks = parse_sse(raw)
         resolved = resolved_model(chunks, resolved)
         usage = last_usage(chunks)
-        cached = _cached_tokens(usage)
+        cached = cached_tokens(usage)
         last = (status, usage, ms, len(chunks))
         if cached > 0:
             break

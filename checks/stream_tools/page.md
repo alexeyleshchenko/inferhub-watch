@@ -48,8 +48,4 @@ Any of:
 - a tool delta with `"name": ""`
 - a required tool call with no non-empty name by the end of the stream
 
-A non-empty but unusual `finish_reason` is stored in evidence and does not fail this check.
-
-## Who should care
-
-You, if your client reads `tool_calls` from the SSE stream. A **pass** here is only this check. Truncation, JSON schema, parallel tools, and other SDK behavior are out of scope.
+A non-empty but unusual `finish_reason` is stored in evidence and does not fail this check. Out of scope: truncation, JSON schema, parallel tools, other SDK behavior.

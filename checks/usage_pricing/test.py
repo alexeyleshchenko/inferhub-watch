@@ -35,18 +35,18 @@ class UsagePricingTests(unittest.TestCase):
         out = self.check.run(_Fake(chunks), "gpt-5.6-luna")
         self.assertEqual(out["status"], "info")
         self.assertIn("cost=", out["summary"])
-        self.assertIn("USDC", out["summary"])
+        self.assertNotIn("USDC", out["summary"])
 
     def test_tokens_only_is_info_not_fail(self) -> None:
         chunks = [{"usage": {"prompt_tokens": 10}}]
         out = self.check.run(_Fake(chunks), "gpt-5.6-luna")
         self.assertEqual(out["status"], "info")
-        self.assertIn("tokens_only", out["summary"])
+        self.assertIn("No price field.", out["summary"])
 
     def test_credit_not_merged_with_cost_as_same_unit(self) -> None:
         chunks = [{"usage": {"cost": 0.001, "credit": 0.01}}]
         out = self.check.run(_Fake(chunks), "gpt-5.6-luna")
-        self.assertIn("not treated as the same unit", out["summary"])
+        self.assertEqual(out["summary"], "cost=0.001, credit=0.01")
 
 
 if __name__ == "__main__":

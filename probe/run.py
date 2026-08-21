@@ -7,7 +7,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from probe.http import InferHubClient
+from probe.payloads import URL
 from probe.registry import load_aliases, load_check_module, load_registry, repo_root
+from probe.result import result
 
 
 def main() -> int:
@@ -28,23 +30,19 @@ def main() -> int:
             except Exception as exc:  # noqa: BLE001 — keep the day, record the cell
                 errors.append(f"{alias}/{spec['id']}: {exc}")
                 cells.append(
-                    {
-                        "check_id": spec["id"],
-                        "alias": alias,
-                        "resolved_model": "",
-                        "status": "error",
-                        "summary": str(exc),
-                        "http_status": None,
-                        "latency_ms": None,
-                        "evidence": {},
-                    }
+                    result(
+                        check_id=spec["id"],
+                        alias=alias,
+                        status="error",
+                        summary=str(exc),
+                    )
                 )
     started = datetime.now(timezone.utc)
     stamp = started.strftime("%Y-%m-%dT%H%M%SZ")
     payload = {
         "started_at": started.isoformat(),
         "origin": "github-actions",
-        "api": "https://api.inferhub.dev/v1/chat/completions",
+        "api": URL,
         "aliases": aliases,
         "checks": [c["id"] for c in registry],
         "cells": cells,

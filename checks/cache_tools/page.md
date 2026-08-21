@@ -9,7 +9,3 @@ The last attempt reports `cached_tokens` (or `prompt_tokens_details.cached_token
 ## Fail
 
 Three streaming completions with `cached_tokens` still 0, or no SSE chunks.
-
-## Who should care
-
-Anyone relying on InferHub prompt caching for ordinary Chat Completions, not only tool calls.

@@ -18,7 +18,7 @@ Scoring checks: streaming **tool names**, and **prompt cache** on a streaming co
 | [checks/](checks/) | One folder per check (`check.py`, `page.md`, `test.py`) |
 | [tests/](tests/) | Cross-cutting wiring only |
 | [probe/run.py](probe/run.py) | Writes [data/runs/](data/runs/) |
-| [site/generate.py](site/generate.py) | Static HTML from the registry and run files |
+| [site/generate.py](site/generate.py) | Builds HTML from [site/templates/](site/templates/) plus the registry and run files |
 
 ## Add a check
 

@@ -81,7 +81,7 @@
       "alias": "gpt-5.6-luna",
       "resolved_model": "cb/gpt-5.6-luna",
       "status": "info",
-      "summary": "Price fields: credit=0.01. InferHub consumer billing is USDC; these numbers are copied as returned. `cost` / `market_cost` / `gateway_cost` are not treated as the same unit as `credit`.",
+      "summary": "credit=0.01",
       "http_status": 200,
       "latency_ms": 1750.2,
       "evidence": {
@@ -143,7 +143,7 @@
       "alias": "deepseek-v4-flash",
       "resolved_model": "cmc/deepseek/deepseek-v4-flash",
       "status": "info",
-      "summary": "tokens_only \u2014 no cost/credit/market_cost. InferHub bills consumers in USDC; this response did not include a price field.",
+      "summary": "No price field.",
       "http_status": 200,
       "latency_ms": 2320.3,
       "evidence": {
@@ -212,7 +212,7 @@
       "alias": "deepseek-v4-pro",
       "resolved_model": "cp/cline-pass/deepseek-v4-pro",
       "status": "info",
-      "summary": "Price fields: cost=0.00040806. InferHub consumer billing is USDC; these numbers are copied as returned. `cost` / `market_cost` / `gateway_cost` are not treated as the same unit as `credit`.",
+      "summary": "cost=0.00040806",
       "http_status": 200,
       "latency_ms": 3794.1,
       "evidence": {
@@ -285,7 +285,7 @@
       "alias": "qwen3.8-max",
       "resolved_model": "cp/cline-pass/qwen3.8-max",
       "status": "info",
-      "summary": "Price fields: cost=0.0013255, market_cost=0.000964, gateway_cost=0.000964. InferHub consumer billing is USDC; these numbers are copied as returned. `cost` / `market_cost` / `gateway_cost` are not treated as the same unit as `credit`.",
+      "summary": "cost=0.0013255, market_cost=0.000964, gateway_cost=0.000964",
       "http_status": 200,
       "latency_ms": 1341.7,
       "evidence": {
@@ -366,7 +366,7 @@
       "alias": "glm-5.3",
       "resolved_model": "cb/glm-5.3",
       "status": "info",
-      "summary": "Price fields: credit=0.01. InferHub consumer billing is USDC; these numbers are copied as returned. `cost` / `market_cost` / `gateway_cost` are not treated as the same unit as `credit`.",
+      "summary": "credit=0.01",
       "http_status": 200,
       "latency_ms": 4392.7,
       "evidence": {
@@ -439,7 +439,7 @@
       "alias": "grok-4.6",
       "resolved_model": "cp/xai/grok-4.6",
       "status": "info",
-      "summary": "tokens_only \u2014 no cost/credit/market_cost. InferHub bills consumers in USDC; this response did not include a price field.",
+      "summary": "No price field.",
       "http_status": 200,
       "latency_ms": 91091.1,
       "evidence": {

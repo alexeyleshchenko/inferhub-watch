@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from probe.http import InferHubClient
 from probe.payloads import completion_payload
-from probe.result import result
+from probe.result import http_preview, result
 from probe.sse import inspect_stream, parse_sse, resolved_model
 
 
@@ -14,7 +14,7 @@ def run(client: InferHubClient, alias: str) -> dict:
             check_id="stream_tools",
             alias=alias,
             status="error",
-            summary=f"HTTP {status}: {raw[:180].replace(chr(10), ' ')}",
+            summary=http_preview(status, raw),
             http_status=status,
             latency_ms=ms,
         )

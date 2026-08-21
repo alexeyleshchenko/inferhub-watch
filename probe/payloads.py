@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-
 URL = "https://api.inferhub.dev/v1/chat/completions"
 USER_AGENT = "inferhub-watch/1.0"
 
@@ -63,8 +61,3 @@ def cache_payload(alias: str, system: str) -> dict:
         ],
         "stream": True,
     }
-
-
-def example_request_json() -> str:
-    sample = completion_payload("<alias>", stream=True)
-    return json.dumps(sample, indent=2)
