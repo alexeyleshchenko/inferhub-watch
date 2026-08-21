@@ -32,9 +32,10 @@ This is not an OpenCrabs changelog or parser bug tracker.
 
 ## Design Principles
 
-Today answers the job; history waits until there are two UTC mornings.
+Today is the job; history is every committed probe, including same-UTC-day reruns.
 Fail is a contract miss on the wire, never a status-page outage.
-Name who InferHub routed, because the alias is not the publisher.
+The alias is the request; the provider sits under it, not in a second column.
+Explanations recede. Verdicts and tables do not.
 Prompt cache is scored on an ordinary streaming completion, not on tools.
 Write for InferHub API callers; OpenCrabs is not on the site.
 

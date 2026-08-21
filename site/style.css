@@ -71,10 +71,10 @@ footer {
 }
 
 footer,
-.pub,
 .crumb,
 .origin,
-.broken-label {
+.broken-label,
+.pub {
   color: var(--muted);
   font-size: 0.82rem;
 }
@@ -121,17 +121,95 @@ h2 {
 
 .hero {
   padding-top: 2.25rem;
+  padding-bottom: 0.25rem;
   max-width: 42rem;
 }
 
-.hero p {
-  text-wrap: pretty;
-  max-width: 65ch;
+.today h2,
+.history h2 {
+  margin: 2rem 0 0.55rem;
+}
+
+.verdict {
+  margin: 0 0 1rem;
+  font-weight: 500;
   color: var(--ink);
 }
 
-.hero code {
-  font-size: 0.92em;
+.alias-cell {
+  font-weight: 500;
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+.alias-cell .alias {
+  display: block;
+}
+
+.alias-cell .pub {
+  display: block;
+  margin-top: 0.28rem;
+  font-weight: 400;
+  font-size: 0.68rem;
+  white-space: normal;
+  max-width: 22ch;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.cell-note {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  max-width: 28ch;
+  text-wrap: pretty;
+}
+
+.notes {
+  margin-top: 4.25rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--line);
+  max-width: 62ch;
+}
+
+.notes h2 {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 0.7rem;
+}
+
+.notes p,
+.notes .explainers p {
+  font-family: var(--serif);
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.notes p {
+  margin: 0 0 1.1rem;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.explainers {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.explainers a {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.explainers p {
+  margin: 0.2rem 0 0;
+  font-size: 0.92rem;
 }
 
 .grid,
@@ -152,7 +230,6 @@ td {
 .matrix tbody th {
   font-weight: 500;
   background: var(--surface);
-  white-space: nowrap;
 }
 
 .grid th,
@@ -223,22 +300,6 @@ td {
   margin: 0;
 }
 
-.explainers {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 1.15rem;
-  max-width: 68ch;
-}
-
-.explainers p {
-  margin: 0.3rem 0 0;
-  color: var(--muted);
-  text-wrap: pretty;
-  font-size: 0.88rem;
-}
-
 .pill {
   display: inline-block;
   font-family: var(--mono);
@@ -274,14 +335,6 @@ td {
   background: var(--primary);
   border-color: var(--primary);
   color: var(--bg);
-}
-
-.matrix p {
-  margin: 0.4rem 0 0;
-  color: var(--muted);
-  font-size: 0.78rem;
-  max-width: 28ch;
-  text-wrap: pretty;
 }
 
 .explainer {
@@ -352,5 +405,12 @@ footer {
     position: sticky;
     left: 0;
     z-index: 1;
+  }
+
+  .grid tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--surface);
   }
 }

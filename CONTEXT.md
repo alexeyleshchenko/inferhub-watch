@@ -9,7 +9,7 @@ The short model name we request (`gpt-5.6-luna`).
 _Avoid_: “model” alone when the publisher prefix matters.
 
 **Resolved publisher**:
-The `model` string InferHub returns, shown with a family label when InferHub’s market table names it (`ClinePass · cp/cline-pass/…`).
+The `model` string InferHub returns. On the board it sits under the alias (`ClinePass · cp/cline-pass/…`), not in its own column.
 
 **Check**:
 One registered experiment: `checks/<id>/check.py` plus `checks/<id>/page.md`.

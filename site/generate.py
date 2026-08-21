@@ -128,12 +128,20 @@ def scoring_pass_count(run: dict, alias: str, check_ids: list[str]) -> tuple[int
     return ok, len(check_ids)
 
 
-def distinct_mornings(runs: list[dict]) -> list[dict]:
-    """Keep the latest run per UTC date so a seed and an Actions rerun are one morning."""
-    by_day: dict[str, dict] = {}
-    for run in runs:
-        by_day[day_key(run)] = run
-    return [by_day[key] for key in sorted(by_day)]
+def run_stamp(run: dict) -> str:
+    raw = run.get("started_at") or ""
+    day = raw[5:10] if len(raw) >= 10 else day_key(run)
+    clock = raw[11:16] if len(raw) >= 16 else ""
+    return f"{day} {clock}".strip()
+
+
+def alias_heading(alias: str, resolved: str) -> str:
+    return (
+        f'<th class="alias-cell">'
+        f'<span class="alias">{html.escape(alias)}</span>'
+        f'<span class="pub">{html.escape(publisher_label(resolved))}</span>'
+        "</th>"
+    )
 
 
 def origin_label(run: dict) -> str:
@@ -214,16 +222,14 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
         return shell("InferHub Watch", body)
 
     latest = runs[-1]
-    mornings = distinct_mornings(runs)
-    window = mornings[-7:]
-    n_mornings = len(window)
+    window = runs[-14:]
 
     grid_head = []
     for run in window:
-        day = html.escape(day_key(run)[5:])
+        stamp = html.escape(run_stamp(run))
         label = origin_label(run)
         grid_head.append(
-            f'<th>{day}<span class="origin">{html.escape(label)}</span></th>'
+            f'<th>{stamp}<span class="origin">{html.escape(label)}</span></th>'
         )
     score_ids = scoring_ids(registry)
     grid_rows = []
@@ -233,7 +239,12 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
             ok, total = scoring_pass_count(run, alias, score_ids)
             cls = "ok" if ok == total else ("mid" if ok else "bad")
             cells.append(f'<td class="{cls}">{ok}/{total}</td>')
-        grid_rows.append(f"<tr><th>{html.escape(alias)}</th>{''.join(cells)}</tr>")
+        last_map = cell_map(window[-1])
+        resolved = ""
+        for spec in registry:
+            cell = last_map.get((alias, spec["id"])) or {}
+            resolved = cell.get("resolved_model") or resolved
+        grid_rows.append(f"<tr>{alias_heading(alias, resolved)}{''.join(cells)}</tr>")
 
     cmap = cell_map(latest)
     check_heads = []
@@ -247,24 +258,24 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
     safe = []
     broken_bits = []
     for alias in aliases:
-        tds = [f"<th>{html.escape(alias)}</th>"]
         resolved = ""
         failed_titles = []
+        check_tds = []
         for spec in registry:
             cell = cmap.get((alias, spec["id"])) or {}
             resolved = cell.get("resolved_model") or resolved
             status = cell.get("status") or "missing"
             summary = cell.get("summary") or ""
-            tds.append(
+            check_tds.append(
                 f'<td class="st-{html.escape(status)}">'
                 f'<span class="pill">{html.escape(status)}</span>'
-                f"<p>{html.escape(summary)}</p></td>"
+                f'<p class="cell-note">{html.escape(summary)}</p></td>'
             )
             if spec.get("scores_rank") and status in ("fail", "error"):
                 failed_titles.append(spec["title"])
-        label = publisher_label(resolved)
-        tds.insert(1, f'<td class="pub">{html.escape(label)}</td>')
-        matrix_rows.append(f"<tr>{''.join(tds)}</tr>")
+        matrix_rows.append(
+            f"<tr>{alias_heading(alias, resolved)}{''.join(check_tds)}</tr>"
+        )
         ok, total = scoring_pass_count(latest, alias, score_ids)
         if total and ok == total:
             safe.append(alias)
@@ -292,58 +303,46 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
     n_score = len(score_ids) or 1
     if safe:
         rec = ", ".join(f"<code>{html.escape(a)}</code>" for a in safe)
-        recommend = (
-            f"<p>Scoring {n_score}/{n_score} today: {rec}. "
-            f"A pass is only that check, not a full SDK suite.</p>"
-        )
+        recommend = f'<p class="verdict">Scoring {n_score}/{n_score}: {rec}.</p>'
     else:
-        recommend = "<p>No alias passed every scoring check this morning.</p>"
+        recommend = (
+            '<p class="verdict">No alias passed every scoring check this run.</p>'
+        )
     broken_after = ""
     if broken_bits:
         broken_after = (
             '<p class="broken-label">Failed scoring checks:</p>'
             f'<ul class="broken">{"".join(broken_bits)}</ul>'
         )
-    mornings_section = ""
-    if n_mornings >= 2:
-        mornings_section = f"""
-    <section>
-      <h2>Mornings</h2>
-      <p>Each cell is how many of the {n_score} scoring checks passed that UTC morning.
-      Same-UTC-day reruns collapse to the later file.</p>
-      <div class="scroll">
-        <table class="grid">
-          <thead><tr><th></th>{"".join(grid_head)}</tr></thead>
-          <tbody>{"".join(grid_rows)}</tbody>
-        </table>
-      </div>
-    </section>
-        """
     body = f"""
     <section class="hero">
       <h1>Daily probe of <a href="https://inferhub.dev/">InferHub</a> <code>/v1/chat/completions</code> streaming shapes.</h1>
-      <p>Each cell is one check against that morning’s JSON — not uptime, not your traffic.
-      <strong>Pass</strong> means the payload matched what that check documents.
-      <strong>Info</strong> never fails a cell. Today’s checks: streaming tool names, prompt cache on a completion with no tools, and price fields.</p>
     </section>
-    <section>
+    <section class="today">
       <h2>Today</h2>
       {recommend}
-      <p>We send the <strong>alias</strong> in <code>model</code>. We do not know if you can pin the resolved id.
-      <strong>Resolved</strong> is who InferHub actually served (full id; known families from InferHub’s market table).</p>
       <div class="scroll">
         <table class="matrix">
-          <thead><tr><th>Alias</th><th>Resolved</th>{"".join(check_heads)}</tr></thead>
+          <thead><tr><th>Alias</th>{"".join(check_heads)}</tr></thead>
           <tbody>{"".join(matrix_rows)}</tbody>
         </table>
       </div>
       {broken_after}
     </section>
-    <section>
-      <h2>What each check means</h2>
-      <ul class="explainers">{"".join(explainers)}</ul>
+    <section class="history">
+      <h2>History</h2>
+      <div class="scroll">
+        <table class="grid">
+          <thead><tr><th>Alias</th>{"".join(grid_head)}</tr></thead>
+          <tbody>{"".join(grid_rows)}</tbody>
+        </table>
+      </div>
     </section>
-    {mornings_section}
+    <aside class="notes">
+      <h2>How to read this</h2>
+      <p>We send the alias in <code>model</code>. The line under it is who InferHub served. A pass is only that check, not a full SDK suite. Info never fails a cell. History is each committed probe (same-day reruns stay as their own columns).</p>
+      <ul class="explainers">{"".join(explainers)}</ul>
+    </aside>
     """
     return shell("InferHub Watch", body, masthead=masthead, page_class="board")
 

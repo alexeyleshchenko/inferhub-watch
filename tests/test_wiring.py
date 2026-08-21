@@ -57,9 +57,20 @@ class WiringTests(unittest.TestCase):
         self.assertNotIn("OpenCrabs", html)
         self.assertNotIn("Seven-day", html)
         self.assertIn("Prompt cache", html)
-        mornings = gen.distinct_mornings(gen.load_runs())
-        if len(mornings) < 2:
-            self.assertNotIn("<h2>Mornings</h2>", html)
+        self.assertIn("<h2>History</h2>", html)
+        self.assertNotIn("<h2>Mornings</h2>", html)
+        self.assertNotIn("<th>Resolved</th>", html)
+        self.assertIn('class="alias-cell"', html)
+        self.assertIn('class="notes"', html)
+        self.assertIn("ClinePass", html)
+        self.assertLess(
+            html.find('class="today"'),
+            html.find('class="history"'),
+        )
+        self.assertLess(
+            html.find('class="history"'),
+            html.find('class="notes"'),
+        )
 
 
 if __name__ == "__main__":
