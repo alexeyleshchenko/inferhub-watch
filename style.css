@@ -509,18 +509,19 @@ td {
 }
 
 .timeline td {
-  padding: 0 1px;
+  padding: 0 2px;
   text-align: center;
   vertical-align: middle;
   border-bottom: 1px solid var(--line);
   cursor: default;
   position: relative;
+  background: transparent;
 }
 
 .timeline td::after {
   content: "";
   display: inline-block;
-  width: 100%;
+  width: 4px;
   height: 24px;
   border-radius: 2px;
   vertical-align: middle;
@@ -581,7 +582,8 @@ td {
     background: transparent;
   }
   .timeline td {
-    padding: 0 1px;
+    padding: 0 2px;
+    background: transparent;
   }
   .timeline td::before {
     content: none;
