@@ -125,12 +125,8 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
         f"{rundata.run_stamp(run)} {rundata.origin_label(run)}" for run in window
     ]
     grid_head = []
-    for run in window:
-        stamp = html.escape(rundata.run_stamp(run))
-        origin = html.escape(rundata.origin_label(run))
-        grid_head.append(
-            f'<th scope="col">{stamp}<span class="origin">{origin}</span></th>'
-        )
+    for _run in window:
+        grid_head.append('<th scope="col"></th>')
     grid_rows = []
     for alias in order:
         cells = []
@@ -138,13 +134,15 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
             ok, total = rundata.scoring_pass_count(run, alias, score_ids)
             cls = "ok" if ok == total else ("mid" if ok else "bad")
             failed = rundata.scoring_failed_ids(run, alias, score_ids)
-            miss = ", ".join(rundata.scoring_short(cid) for cid in failed)
-            miss_html = (
-                f'<span class="grid-miss">{html.escape(miss)}</span>' if miss else ""
-            )
+            title_parts = [col_label, f"{ok}/{total}"]
+            if failed:
+                miss = ", ".join(rundata.scoring_short(cid) for cid in failed)
+                title_parts.append(f"missed: {miss}")
+            else:
+                title_parts.append("all pass")
+            title = " · ".join(title_parts)
             cells.append(
-                f'<td class="{cls}" data-label="{html.escape(col_label)}">'
-                f'<span class="frac">{ok}/{total}</span>{miss_html}</td>'
+                f'<td class="{cls}" title="{html.escape(title)}"></td>'
             )
         resolved = rundata.resolved_for_alias(window[-1], alias, registry)
         grid_rows.append(f"<tr>{alias_heading(alias, resolved)}{''.join(cells)}</tr>")
