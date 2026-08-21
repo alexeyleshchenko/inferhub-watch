@@ -43,13 +43,29 @@ def completion_payload(
 
 CACHE_USER = "Reply with the single word paris. Nothing else."
 
+# DeepSeek / OpenAI-style prompt cache usually ignores prefixes under ~1024 tokens.
+# Character/4 undercounts some tokenizers; require 2048 estimated so we clear the floor.
+CACHE_PREFIX_MIN_TOKENS = 2048
+_CACHE_CHARS_PER_TOKEN = 4
+
+
+def approx_prompt_tokens(text: str) -> int:
+    return max(len(text) // _CACHE_CHARS_PER_TOKEN, len(text.split()))
+
 
 def cache_prefix() -> str:
-    pad = ("The same instructions apply on every turn. " * 80).strip()
-    return (
+    head = (
         "You are a concise assistant. Follow the user. "
-        "Keep answers to one word when asked. " + pad
+        "Keep answers to one word when asked. "
+        "The same instructions apply on every turn.\n"
     )
+    line = "Cache prefix line {:04d}: keep this system text identical on every retry.\n"
+    parts = [head]
+    n = 1
+    while approx_prompt_tokens("".join(parts)) < CACHE_PREFIX_MIN_TOKENS:
+        parts.append(line.format(n))
+        n += 1
+    return "".join(parts)
 
 
 def cache_payload(alias: str, system: str) -> dict:

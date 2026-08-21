@@ -3,7 +3,14 @@ from __future__ import annotations
 import json
 import unittest
 
+from probe.payloads import (
+    CACHE_PREFIX_MIN_TOKENS,
+    approx_prompt_tokens,
+    cache_payload,
+    cache_prefix,
+)
 from probe.registry import load_check_module
+from probe.sse import cached_tokens
 
 
 def _sse(chunks: list[dict]) -> str:
@@ -61,6 +68,29 @@ class CacheToolsTests(unittest.TestCase):
         out = self.check.run(client, "gpt-5.6-luna")
         self.assertEqual(out["status"], "fail")
         self.assertIn("cached_tokens", out["summary"])
+
+    def test_prefix_clears_provider_floor(self) -> None:
+        prefix = cache_prefix()
+        self.assertGreaterEqual(approx_prompt_tokens(prefix), CACHE_PREFIX_MIN_TOKENS)
+        payload = cache_payload("deepseek-v4-pro", prefix)
+        self.assertNotIn("tools", payload)
+        self.assertGreaterEqual(
+            approx_prompt_tokens(payload["messages"][0]["content"]),
+            CACHE_PREFIX_MIN_TOKENS,
+        )
+
+    def test_hit_field_is_not_only_openai_cached_tokens(self) -> None:
+        self.assertEqual(cached_tokens({"prompt_cache_hit_tokens": 640}), 640)
+        self.assertEqual(
+            cached_tokens(
+                {
+                    "cached_tokens": 0,
+                    "prompt_tokens_details": {"cached_tokens": 0},
+                    "prompt_cache_hit_tokens": 256,
+                }
+            ),
+            256,
+        )
 
 
 if __name__ == "__main__":

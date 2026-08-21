@@ -103,5 +103,21 @@ def usage_pricing_fields(usage: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def _int_tokens(value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return 0
+    return int(value)
+
+
 def cached_tokens(usage: dict[str, Any]) -> int:
-    return int(usage_pricing_fields(usage).get("cached_tokens") or 0)
+    details = usage.get("prompt_tokens_details")
+    if not isinstance(details, dict):
+        details = {}
+    return max(
+        _int_tokens(usage.get("cached_tokens")),
+        _int_tokens(usage.get("prompt_cache_hit_tokens")),
+        _int_tokens(usage.get("cache_read_input_tokens")),
+        _int_tokens(details.get("cached_tokens")),
+        _int_tokens(details.get("cache_read_input_tokens")),
+        _int_tokens(details.get("prompt_cache_hit_tokens")),
+    )

@@ -38,7 +38,7 @@ The alias is the request; the publisher sits under it, not in a second column.
 Safe to use is the board headline: aliases that passed both scoring checks (tools + cache). Fail rows sit below.
 Price is info; it never ranks and must not share pass/fail pill chrome.
 How we test recedes. Verdicts and tables do not.
-Prompt cache is scored on an ordinary streaming completion, not on tools.
+Prompt cache is scored on an ordinary streaming completion (no tools) with a prefix well past ~1024 tokens, not a short pad.
 Write for InferHub API callers; OpenCrabs is not on the site.
 
 ## Accessibility & Inclusion
