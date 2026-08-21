@@ -309,7 +309,7 @@ h2 {
 }
 
 .explanations h3 {
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 500;
   color: var(--ink);
   margin: var(--space-6) 0 var(--space-3);
@@ -593,10 +593,6 @@ footer {
     font-size: 1.5rem;
   }
 
-  h2 {
-    font-size: 1.125rem;
-  }
-
   .nav-menu summary {
     display: inline-flex;
   }
@@ -682,14 +678,14 @@ footer {
     font-weight: 500;
   }
 
+  .cell-note {
+    max-width: none;
+  }
+
   .grid td.ok::before,
   .grid td.mid::before,
   .grid td.bad::before {
     color: var(--bg);
-  }
-
-  .cell-note {
-    max-width: none;
   }
 
   .grid td {
