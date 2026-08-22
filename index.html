@@ -42,16 +42,11 @@
 <section class="history" id="earlier">
   <h2>Past runs</h2>
   <p class="section-note">Each column is one committed probe. Same-day reruns stay separate. A cell is how many of the
-    2 scoring checks passed, and which ones missed.</p>
+    2 scoring checks passed (2/2: tools + cache), and which ones missed.</p>
   <div class="scroll">
-    <table class="grid">
-      <caption>Pass counts for tools and cache. Column labels mark Actions · CI versus seed · fixture.</caption>
-      <thead>
-        <tr>
-          <th scope="col">Alias</th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody><tr><th class="alias-cell" scope="row"><span class="alias">deepseek-v4-flash</span><span class="pub">deepseek · cmc/deepseek/deepseek-v4-flash</span></th><td class="mid" title="08-21 09:00 seed · fixture · 1/2 · missed: cache"></td><td class="mid" title="08-21 12:23 Actions · CI · 1/2 · missed: cache"></td><td class="ok" title="08-21 14:06 Actions · CI · 2/2 · all pass"></td><td class="ok" title="08-21 15:46 Actions · CI · 2/2 · all pass"></td><td class="ok" title="08-21 16:04 Actions · CI · 2/2 · all pass"></td><td class="ok" title="08-21 16:33 Actions · CI · 2/2 · all pass"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">deepseek-v4-pro</span><span class="pub">ClinePass · cp/cline-pass/deepseek-v4-pro</span></th><td class="ok" title="08-21 09:00 seed · fixture · 2/2 · all pass"></td><td class="ok" title="08-21 12:23 Actions · CI · 2/2 · all pass"></td><td class="mid" title="08-21 14:06 Actions · CI · 1/2 · missed: cache"></td><td class="mid" title="08-21 15:46 Actions · CI · 1/2 · missed: cache"></td><td class="ok" title="08-21 16:04 Actions · CI · 2/2 · all pass"></td><td class="ok" title="08-21 16:33 Actions · CI · 2/2 · all pass"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">grok-4.6</span><span class="pub">ClinePass / xai · cp/xai/grok-4.6</span></th><td class="ok" title="08-21 09:00 seed · fixture · 2/2 · all pass"></td><td class="ok" title="08-21 12:23 Actions · CI · 2/2 · all pass"></td><td class="mid" title="08-21 14:06 Actions · CI · 1/2 · missed: tools"></td><td class="ok" title="08-21 15:46 Actions · CI · 2/2 · all pass"></td><td class="ok" title="08-21 16:04 Actions · CI · 2/2 · all pass"></td><td class="ok" title="08-21 16:33 Actions · CI · 2/2 · all pass"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">gpt-5.6-luna</span><span class="pub">cb · cb/gpt-5.6-luna</span></th><td class="mid" title="08-21 09:00 seed · fixture · 1/2 · missed: tools"></td><td class="mid" title="08-21 12:23 Actions · CI · 1/2 · missed: tools"></td><td class="bad" title="08-21 14:06 Actions · CI · 0/2 · missed: tools, cache"></td><td class="mid" title="08-21 15:46 Actions · CI · 1/2 · missed: tools"></td><td class="mid" title="08-21 16:04 Actions · CI · 1/2 · missed: tools"></td><td class="mid" title="08-21 16:33 Actions · CI · 1/2 · missed: tools"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">qwen3.8-max</span><span class="pub">ClinePass · cp/cline-pass/qwen3.8-max</span></th><td class="ok" title="08-21 09:00 seed · fixture · 2/2 · all pass"></td><td class="ok" title="08-21 12:23 Actions · CI · 2/2 · all pass"></td><td class="mid" title="08-21 14:06 Actions · CI · 1/2 · missed: cache"></td><td class="mid" title="08-21 15:46 Actions · CI · 1/2 · missed: cache"></td><td class="ok" title="08-21 16:04 Actions · CI · 2/2 · all pass"></td><td class="mid" title="08-21 16:33 Actions · CI · 1/2 · missed: cache"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">glm-5.3</span><span class="pub">cb · cb/glm-5.3</span></th><td class="mid" title="08-21 09:00 seed · fixture · 1/2 · missed: tools"></td><td class="mid" title="08-21 12:23 Actions · CI · 1/2 · missed: tools"></td><td class="mid" title="08-21 14:06 Actions · CI · 1/2 · missed: tools"></td><td class="mid" title="08-21 15:46 Actions · CI · 1/2 · missed: tools"></td><td class="mid" title="08-21 16:04 Actions · CI · 1/2 · missed: tools"></td><td class="mid" title="08-21 16:33 Actions · CI · 1/2 · missed: tools"></td></tr></tbody>
+    <table class="timeline">
+      <caption>Hover or tap a bar for the run stamp, origin, pass count, and missed checks.</caption>
+      <tbody><tr><th class="alias-cell" scope="row"><span class="alias">deepseek-v4-flash</span><span class="pub">deepseek · cmc/deepseek/deepseek-v4-flash</span></th><td class="mid" data-tip="08-21 09:00 seed · fixture · 1/2 · missed: cache" tabindex="0"></td><td class="mid" data-tip="08-21 12:23 Actions · CI · 1/2 · missed: cache" tabindex="0"></td><td class="ok" data-tip="08-21 14:06 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 15:46 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 16:04 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 16:33 Actions · CI · 2/2 · all pass" tabindex="0"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">deepseek-v4-pro</span><span class="pub">ClinePass · cp/cline-pass/deepseek-v4-pro</span></th><td class="ok" data-tip="08-21 09:00 seed · fixture · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 12:23 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="mid" data-tip="08-21 14:06 Actions · CI · 1/2 · missed: cache" tabindex="0"></td><td class="mid" data-tip="08-21 15:46 Actions · CI · 1/2 · missed: cache" tabindex="0"></td><td class="ok" data-tip="08-21 16:04 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 16:33 Actions · CI · 2/2 · all pass" tabindex="0"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">grok-4.6</span><span class="pub">ClinePass / xai · cp/xai/grok-4.6</span></th><td class="ok" data-tip="08-21 09:00 seed · fixture · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 12:23 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="mid" data-tip="08-21 14:06 Actions · CI · 1/2 · missed: tools" tabindex="0"></td><td class="ok" data-tip="08-21 15:46 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 16:04 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 16:33 Actions · CI · 2/2 · all pass" tabindex="0"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">gpt-5.6-luna</span><span class="pub">cb · cb/gpt-5.6-luna</span></th><td class="mid" data-tip="08-21 09:00 seed · fixture · 1/2 · missed: tools" tabindex="0"></td><td class="mid" data-tip="08-21 12:23 Actions · CI · 1/2 · missed: tools" tabindex="0"></td><td class="bad" data-tip="08-21 14:06 Actions · CI · 0/2 · missed: tools, cache" tabindex="0"></td><td class="mid" data-tip="08-21 15:46 Actions · CI · 1/2 · missed: tools" tabindex="0"></td><td class="mid" data-tip="08-21 16:04 Actions · CI · 1/2 · missed: tools" tabindex="0"></td><td class="mid" data-tip="08-21 16:33 Actions · CI · 1/2 · missed: tools" tabindex="0"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">qwen3.8-max</span><span class="pub">ClinePass · cp/cline-pass/qwen3.8-max</span></th><td class="ok" data-tip="08-21 09:00 seed · fixture · 2/2 · all pass" tabindex="0"></td><td class="ok" data-tip="08-21 12:23 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="mid" data-tip="08-21 14:06 Actions · CI · 1/2 · missed: cache" tabindex="0"></td><td class="mid" data-tip="08-21 15:46 Actions · CI · 1/2 · missed: cache" tabindex="0"></td><td class="ok" data-tip="08-21 16:04 Actions · CI · 2/2 · all pass" tabindex="0"></td><td class="mid" data-tip="08-21 16:33 Actions · CI · 1/2 · missed: cache" tabindex="0"></td></tr><tr><th class="alias-cell" scope="row"><span class="alias">glm-5.3</span><span class="pub">cb · cb/glm-5.3</span></th><td class="mid" data-tip="08-21 09:00 seed · fixture · 1/2 · missed: tools" tabindex="0"></td><td class="mid" data-tip="08-21 12:23 Actions · CI · 1/2 · missed: tools" tabindex="0"></td><td class="mid" data-tip="08-21 14:06 Actions · CI · 1/2 · missed: tools" tabindex="0"></td><td class="mid" data-tip="08-21 15:46 Actions · CI · 1/2 · missed: tools" tabindex="0"></td><td class="mid" data-tip="08-21 16:04 Actions · CI · 1/2 · missed: tools" tabindex="0"></td><td class="mid" data-tip="08-21 16:33 Actions · CI · 1/2 · missed: tools" tabindex="0"></td></tr></tbody>
     </table>
   </div>
 </section>
@@ -164,6 +159,77 @@
   document.querySelectorAll(".site-nav a").forEach(function (a) {
     a.addEventListener("click", closeNav);
   });
+})();
+
+/* Timeline tooltips: hover on pointer devices, tap to toggle on touch. */
+(function () {
+  var cells = document.querySelectorAll(".timeline td[data-tip]");
+  if (!cells.length) return;
+
+  var tip = document.createElement("div");
+  tip.id = "tipbox";
+  tip.className = "tipbox";
+  tip.setAttribute("role", "tooltip");
+  tip.hidden = true;
+  document.body.appendChild(tip);
+
+  var current = null;
+
+  function hide() {
+    tip.hidden = true;
+    if (current) current.classList.remove("tip-open");
+    current = null;
+  }
+
+  function place(cell) {
+    var r = cell.getBoundingClientRect();
+    var tw = tip.offsetWidth;
+    var th = tip.offsetHeight;
+    var left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+    var top = r.top - th - 8;
+    if (top < 8) top = r.bottom + 8;
+    tip.style.left = left + window.scrollX + "px";
+    tip.style.top = top + window.scrollY + "px";
+  }
+
+  function show(cell) {
+    var text = cell.getAttribute("data-tip");
+    if (!text) return;
+    tip.textContent = text;
+    tip.hidden = false;
+    if (current && current !== cell) current.classList.remove("tip-open");
+    current = cell;
+    cell.classList.add("tip-open");
+    place(cell);
+  }
+
+  if (window.matchMedia("(hover: hover)").matches) {
+    cells.forEach(function (cell) {
+      cell.addEventListener("mouseenter", function () { show(cell); });
+      cell.addEventListener("mouseleave", function () { hide(); });
+    });
+  }
+
+  cells.forEach(function (cell) {
+    cell.addEventListener("focus", function () { show(cell); });
+    cell.addEventListener("blur", function () { hide(); });
+    cell.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (current === cell && !tip.hidden) hide();
+      else show(cell);
+    });
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!tip.hidden && e.target !== tip && !tip.contains(e.target)) hide();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") hide();
+  });
+  window.addEventListener("scroll", function () {
+    if (!tip.hidden) hide();
+  }, { passive: true });
 })();
 </script>
   </body>

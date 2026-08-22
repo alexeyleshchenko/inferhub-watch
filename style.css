@@ -406,7 +406,6 @@ h2 {
   line-height: 1.4;
 }
 
-.grid,
 .matrix {
   width: 100%;
   border-collapse: collapse;
@@ -435,44 +434,9 @@ td {
   background: var(--surface);
 }
 
-.grid th,
-.grid td,
 .matrix th {
   font-family: var(--mono);
   font-size: var(--text-caption);
-}
-
-.grid td {
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
-
-.grid .frac {
-  display: block;
-}
-
-.grid-miss {
-  display: block;
-  margin-top: 0.2rem;
-  font-weight: 400;
-  font-size: 0.68rem;
-  color: var(--bg);
-  opacity: 0.85;
-}
-
-.grid td.ok {
-  color: var(--bg);
-  background: var(--ok);
-}
-
-.grid td.mid {
-  color: var(--bg);
-  background: var(--mid);
-}
-
-.grid td.bad {
-  color: var(--bg);
-  background: var(--fail);
 }
 
 /* ── History timeline (Gatus-style thin bars) ── */
@@ -493,19 +457,17 @@ td {
   text-wrap: pretty;
 }
 
-.timeline thead th {
-  height: 0;
-  padding: 0;
-  border: 0;
-  line-height: 0;
-}
-
 .timeline tbody th {
   font-weight: 500;
   padding: 0.5rem 0.7rem 0.5rem 0;
   text-align: left;
   white-space: nowrap;
   vertical-align: middle;
+}
+
+/* Shrink alias column to content so run bars share the row evenly */
+.timeline th.alias-cell {
+  width: 1%;
 }
 
 .timeline td {
@@ -608,13 +570,6 @@ td {
 
 .matrix thead .th-role {
   padding: 0 0.55rem 0.55rem;
-}
-
-.grid th .origin {
-  display: block;
-  font-weight: 400;
-  margin-top: 0.2rem;
-  color: var(--muted);
 }
 
 .pill {
@@ -727,14 +682,12 @@ footer {
     display: flex;
   }
 
-  .matrix,
-  .grid {
+  .matrix {
     border-collapse: separate;
     border-spacing: 0;
   }
 
-  .matrix thead,
-  .grid thead {
+  .matrix thead {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -747,40 +700,32 @@ footer {
   }
 
   .matrix tbody,
-  .grid tbody,
   .matrix tr,
-  .grid tr,
   .matrix th,
-  .grid th,
-  .matrix td,
-  .grid td {
+  .matrix td {
     display: block;
     width: 100%;
     max-width: none;
   }
 
-  .matrix tr,
-  .grid tr {
+  .matrix tr {
     margin: 0 0 var(--space-5);
     padding: var(--space-3) 0;
     border-bottom: 1px solid var(--line);
   }
 
-  .matrix tbody th,
-  .grid tbody th {
+  .matrix tbody th {
     position: static;
     padding: var(--space-3) 0;
     background: transparent;
   }
 
-  .matrix td,
-  .grid td {
+  .matrix td {
     padding: var(--space-4) 0;
     border-bottom: 0;
   }
 
-  .matrix td::before,
-  .grid td::before {
+  .matrix td::before {
     content: attr(data-label);
     display: block;
     margin-bottom: var(--space-2);
@@ -791,16 +736,6 @@ footer {
 
   .cell-note {
     max-width: none;
-  }
-
-  .grid td.ok::before,
-  .grid td.mid::before,
-  .grid td.bad::before {
-    color: var(--bg);
-  }
-
-  .grid td {
-    text-align: left;
   }
 
   .matrix tr.row-safe .alias-cell,
@@ -820,4 +755,30 @@ footer {
     display: inline-flex;
     align-items: center;
   }
+}
+/* ── Timeline tooltip (hover + tap) ── */
+
+.tipbox {
+  position: absolute;
+  z-index: var(--z-head);
+  max-width: 16rem;
+  padding: 0.45rem 0.6rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--text-caption);
+  font-family: var(--mono);
+  line-height: 1.4;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.25);
+  pointer-events: none;
+}
+
+.tipbox[hidden] {
+  display: none;
+}
+
+.timeline td[data-tip]:focus-visible,
+.timeline td.tip-open {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
 }
