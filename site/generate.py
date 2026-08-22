@@ -228,6 +228,7 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
         matrix_rows="".join(matrix_rows),
         n_score=str(n_score),
         score_label="check" if n_score == 1 else "checks",
+        rule=rule,
         grid_head="".join(grid_head),
         grid_rows="".join(grid_rows),
         explainers="".join(explainers),

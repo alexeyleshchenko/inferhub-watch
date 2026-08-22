@@ -168,7 +168,7 @@ class WiringTests(unittest.TestCase):
         self.assertIn("check-col col-info", html)
         self.assertIn("info · not ranked", html)
         self.assertNotIn('class="st-info"><span class="pill"', html)
-        self.assertIn('class="grid-miss"', html)
+        self.assertIn('class="timeline"', html)
         self.assertIn("Actions · CI", html)
         self.assertIn("seed · fixture", html)
         self.assertIn("<caption>", html)
