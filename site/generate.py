@@ -131,7 +131,7 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
             ok, total = rundata.scoring_pass_count(run, alias, score_ids)
             cls = "ok" if ok == total else ("mid" if ok else "bad")
             failed = rundata.scoring_failed_ids(run, alias, score_ids)
-            title_parts = [alias, col_label, f"{ok}/{total}"]
+            title_parts = [col_label, f"{ok}/{total}"]
             if failed:
                 miss = ", ".join(rundata.scoring_short(cid) for cid in failed)
                 title_parts.append(f"missed: {miss}")
@@ -141,7 +141,8 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
             cells.append(
                 f'<td class="{cls}" title="{html.escape(title)}"></td>'
             )
-        grid_rows.append(f"<tr>{''.join(cells)}</tr>")
+        resolved = rundata.resolved_for_alias(window[-1], alias, registry)
+        grid_rows.append(f"<tr>{alias_heading(alias, resolved)}{''.join(cells)}</tr>")
 
     cmap = rundata.cell_map(latest)
     check_heads = []

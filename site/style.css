@@ -457,6 +457,14 @@ td {
   text-wrap: pretty;
 }
 
+.timeline tbody th {
+  font-weight: 500;
+  padding: 0.5rem 0.7rem 0.5rem 0;
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
 .timeline td {
   padding: 0 2px;
   text-align: center;
@@ -525,6 +533,10 @@ td {
     margin: 0;
     padding: 0;
     border-bottom: 0;
+  }
+  .timeline tbody th {
+    padding: 0.5rem 0.7rem 0.5rem 0;
+    background: transparent;
   }
   .timeline td {
     padding: 0 2px;
