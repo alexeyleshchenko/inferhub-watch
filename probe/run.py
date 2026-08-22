@@ -11,23 +11,31 @@ from probe.payloads import URL
 from probe.registry import load_aliases, load_check_module, load_registry, repo_root
 from probe.result import result
 
+BALANCE_MARKERS = ("balance too low", "insufficient_balance")
 
-def main() -> int:
-    key = os.environ.get("INFERHUB_API_KEY", "").strip()
-    if not key:
-        print("INFERHUB_API_KEY is required", file=sys.stderr)
-        return 2
-    client = InferHubClient(key)
-    aliases = load_aliases()
-    registry = load_registry()
+
+class BalanceTooLow(RuntimeError):
+    """InferHub reported an out-of-balance error; the probe must abort."""
+
+
+def balance_too_low(text: str) -> bool:
+    lowered = (text or "").lower()
+    return any(marker in lowered for marker in BALANCE_MARKERS)
+
+
+def collect_cells(
+    client: InferHubClient, aliases: list[str], registry: list[dict]
+) -> tuple[list[dict], list[str]]:
     cells = []
     errors = []
     for alias in aliases:
         for spec in registry:
             module = load_check_module(spec["id"])
             try:
-                cells.append(module.run(client, alias))
+                cell = module.run(client, alias)
             except Exception as exc:  # noqa: BLE001 — keep the day, record the cell
+                if balance_too_low(str(exc)):
+                    raise BalanceTooLow(f"{alias}/{spec['id']}: {exc}") from exc
                 errors.append(f"{alias}/{spec['id']}: {exc}")
                 cells.append(
                     result(
@@ -37,6 +45,26 @@ def main() -> int:
                         summary=str(exc),
                     )
                 )
+                continue
+            if balance_too_low(cell.get("summary") or ""):
+                raise BalanceTooLow(f"{alias}/{spec['id']}: {cell.get('summary')}")
+            cells.append(cell)
+    return cells, errors
+
+
+def main() -> int:
+    key = os.environ.get("INFERHUB_API_KEY", "").strip()
+    if not key:
+        print("INFERHUB_API_KEY is required", file=sys.stderr)
+        return 2
+    client = InferHubClient(key)
+    aliases = load_aliases()
+    registry = load_registry()
+    try:
+        cells, errors = collect_cells(client, aliases, registry)
+    except BalanceTooLow as exc:
+        print(f"Aborting probe, no run written — {exc}", file=sys.stderr)
+        return 3
     started = datetime.now(timezone.utc)
     stamp = started.strftime("%Y-%m-%dT%H%M%SZ")
     payload = {

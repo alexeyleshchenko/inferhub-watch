@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
+import tempfile
+import types
 import unittest
+from pathlib import Path
+from unittest import mock
 
 from probe.registry import load_registry, repo_root
 
@@ -177,5 +182,109 @@ class WiringTests(unittest.TestCase):
         self.assertNotIn("Run it yourself", html)
 
 
+def _load_run():
+    import probe.run as run_mod
+
+    return run_mod
+
+
+class BalanceAbortTests(unittest.TestCase):
+    def test_detector_matches_balance_markers_only(self) -> None:
+        run_mod = _load_run()
+        self.assertTrue(
+            run_mod.balance_too_low(
+                'HTTP 402: {"error":{"message":"balance too low",'
+                '"type":"insufficient_balance"}}'
+            )
+        )
+        self.assertTrue(run_mod.balance_too_low("gateway says insufficient_balance"))
+        self.assertFalse(run_mod.balance_too_low("HTTP 500: upstream timeout"))
+
+    def test_collect_cells_raises_on_balance_cell(self) -> None:
+        run_mod = _load_run()
+        cell = {
+            "check_id": "stream_tools",
+            "alias": "x",
+            "status": "error",
+            "summary": 'HTTP 402: {"error":{"message":"balance too low"}}',
+        }
+        stub = types.SimpleNamespace(run=lambda client, alias: dict(cell))
+        with mock.patch.object(run_mod, "load_check_module", return_value=stub):
+            with self.assertRaises(run_mod.BalanceTooLow):
+                run_mod.collect_cells(object(), ["a"], [{"id": "stream_tools"}])
+
+    def test_collect_cells_raises_on_balance_exception(self) -> None:
+        run_mod = _load_run()
+
+        def boom(client, alias):
+            raise RuntimeError("insufficient_balance for key")
+
+        stub = types.SimpleNamespace(run=boom)
+        with mock.patch.object(run_mod, "load_check_module", return_value=stub):
+            with self.assertRaises(run_mod.BalanceTooLow):
+                run_mod.collect_cells(object(), ["a"], [{"id": "stream_tools"}])
+
+    def test_main_aborts_without_writing_a_run(self) -> None:
+        run_mod = _load_run()
+        cell = {
+            "check_id": "stream_tools",
+            "alias": "x",
+            "status": "error",
+            "summary": 'HTTP 402: {"error":{"message":"balance too low"}}',
+        }
+        stub = types.SimpleNamespace(run=lambda client, alias: dict(cell))
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(
+                run_mod, "load_check_module", return_value=stub
+            ), mock.patch.object(
+                run_mod, "load_aliases", return_value=["x"]
+            ), mock.patch.object(
+                run_mod, "load_registry", return_value=[{"id": "stream_tools"}]
+            ), mock.patch.object(
+                run_mod, "InferHubClient", return_value=object()
+            ), mock.patch.object(
+                run_mod, "repo_root", return_value=Path(tmp)
+            ), mock.patch.dict(
+                os.environ, {"INFERHUB_API_KEY": "test-key"}
+            ):
+                code = run_mod.main()
+            runs = list((Path(tmp) / "data" / "runs").glob("*.json")) if (
+                Path(tmp) / "data" / "runs"
+            ).exists() else []
+        self.assertEqual(code, 3)
+        self.assertEqual(runs, [])
+
+    def test_main_writes_run_when_no_balance_error(self) -> None:
+        run_mod = _load_run()
+        cell = {
+            "check_id": "stream_tools",
+            "alias": "x",
+            "status": "pass",
+            "summary": "Named tools: get_weather.",
+        }
+        stub = types.SimpleNamespace(run=lambda client, alias: dict(cell))
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(
+                run_mod, "load_check_module", return_value=stub
+            ), mock.patch.object(
+                run_mod, "load_aliases", return_value=["x"]
+            ), mock.patch.object(
+                run_mod, "load_registry", return_value=[{"id": "stream_tools"}]
+            ), mock.patch.object(
+                run_mod, "InferHubClient", return_value=object()
+            ), mock.patch.object(
+                run_mod, "repo_root", return_value=Path(tmp)
+            ), mock.patch.dict(
+                os.environ, {"INFERHUB_API_KEY": "test-key"}
+            ):
+                code = run_mod.main()
+            runs = sorted((Path(tmp) / "data" / "runs").glob("*.json"))
+            payload = json.loads(runs[0].read_text()) if len(runs) == 1 else {}
+        self.assertEqual(code, 0)
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(payload["cells"][0]["status"], "pass")
+
+
 if __name__ == "__main__":
     unittest.main()
+
