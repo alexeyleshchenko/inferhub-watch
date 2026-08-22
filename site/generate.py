@@ -139,7 +139,8 @@ def index_html(runs: list[dict], aliases: list[str], registry: list[dict]) -> st
                 title_parts.append("all pass")
             title = " · ".join(title_parts)
             cells.append(
-                f'<td class="{cls}" title="{html.escape(title)}"></td>'
+                f'<td class="{cls}" data-tip="{html.escape(title)}"'
+                ' tabindex="0"></td>'
             )
         resolved = rundata.resolved_for_alias(window[-1], alias, registry)
         grid_rows.append(f"<tr>{alias_heading(alias, resolved)}{''.join(cells)}</tr>")

@@ -756,3 +756,29 @@ footer {
     align-items: center;
   }
 }
+/* ── Timeline tooltip (hover + tap) ── */
+
+.tipbox {
+  position: absolute;
+  z-index: var(--z-head);
+  max-width: 16rem;
+  padding: 0.45rem 0.6rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--text-caption);
+  font-family: var(--mono);
+  line-height: 1.4;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.25);
+  pointer-events: none;
+}
+
+.tipbox[hidden] {
+  display: none;
+}
+
+.timeline td[data-tip]:focus-visible,
+.timeline td.tip-open {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
