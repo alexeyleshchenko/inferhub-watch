@@ -1,0 +1,225 @@
+{
+  "started_at": "2026-09-01T10:59:17.816121+00:00",
+  "origin": "github-actions",
+  "api": "https://api.inferhub.dev/v1/chat/completions",
+  "aliases": [
+    "gpt-5.6-luna",
+    "deepseek-v4-flash",
+    "deepseek-v4-pro",
+    "qwen3.8-max",
+    "glm-5.3",
+    "grok-4.6"
+  ],
+  "checks": [
+    "stream_tools",
+    "cache_tools",
+    "usage_pricing"
+  ],
+  "cells": [
+    {
+      "check_id": "stream_tools",
+      "alias": "gpt-5.6-luna",
+      "resolved_model": "",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 78140.4,
+      "evidence": {}
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "gpt-5.6-luna",
+      "resolved_model": "gpt-5.6-luna",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 2599.2,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7"
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "gpt-5.6-luna",
+      "resolved_model": "gpt-5.6-luna",
+      "status": "info",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 454.4,
+      "evidence": {
+        "usage": {}
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "deepseek-v4-flash",
+      "resolved_model": "",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 28.2,
+      "evidence": {}
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "deepseek-v4-flash",
+      "resolved_model": "deepseek-v4-flash",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 29.1,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7"
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "deepseek-v4-flash",
+      "resolved_model": "deepseek-v4-flash",
+      "status": "info",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 32.5,
+      "evidence": {
+        "usage": {}
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "deepseek-v4-pro",
+      "resolved_model": "",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 25.1,
+      "evidence": {}
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "deepseek-v4-pro",
+      "resolved_model": "deepseek-v4-pro",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 44.1,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7"
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "deepseek-v4-pro",
+      "resolved_model": "deepseek-v4-pro",
+      "status": "info",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 2434.2,
+      "evidence": {
+        "usage": {}
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "qwen3.8-max",
+      "resolved_model": "",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 40.0,
+      "evidence": {}
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "qwen3.8-max",
+      "resolved_model": "qwen3.8-max",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 427.1,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7"
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "qwen3.8-max",
+      "resolved_model": "qwen3.8-max",
+      "status": "info",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 26.2,
+      "evidence": {
+        "usage": {}
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "glm-5.3",
+      "resolved_model": "",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 229.4,
+      "evidence": {}
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "glm-5.3",
+      "resolved_model": "glm-5.3",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 449.5,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7"
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "glm-5.3",
+      "resolved_model": "glm-5.3",
+      "status": "info",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 38.4,
+      "evidence": {
+        "usage": {}
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "grok-4.6",
+      "resolved_model": "",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"all backends failed\",\"type\":\"server_error\"}",
+      "http_status": 502,
+      "latency_ms": 24.0,
+      "evidence": {}
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "grok-4.6",
+      "resolved_model": "grok-4.6",
+      "status": "error",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 66407.0,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7"
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "grok-4.6",
+      "resolved_model": "grok-4.6",
+      "status": "info",
+      "summary": "HTTP 502: {\"error\":\"upstream error\",\"type\":\"server_error\",\"upstream_status\":502}",
+      "http_status": 502,
+      "latency_ms": 60150.8,
+      "evidence": {
+        "usage": {}
+      }
+    }
+  ],
+  "runner_errors": []
+}
