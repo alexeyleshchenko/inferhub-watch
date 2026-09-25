@@ -1,0 +1,341 @@
+{
+  "started_at": "2026-09-25T10:58:04.788135+00:00",
+  "origin": "github-actions",
+  "api": "https://api.inferhub.dev/v1/chat/completions",
+  "aliases": [
+    "gpt-5.6-luna",
+    "deepseek-v4-flash",
+    "deepseek-v4-pro",
+    "qwen3.8-max",
+    "glm-5.3",
+    "grok-4.6"
+  ],
+  "checks": [
+    "stream_tools",
+    "cache_tools",
+    "usage_pricing"
+  ],
+  "cells": [
+    {
+      "check_id": "stream_tools",
+      "alias": "gpt-5.6-luna",
+      "resolved_model": "cx/gpt-5.6-luna",
+      "status": "pass",
+      "summary": "Streamed a tool call named get_weather.",
+      "http_status": 200,
+      "latency_ms": 2935.3,
+      "evidence": {
+        "chunk_count": 8,
+        "empty_name_chunks": 0,
+        "empty_finish_chunks": 0,
+        "names": [
+          "get_weather"
+        ],
+        "last_finish_reason": "tool_calls"
+      }
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "gpt-5.6-luna",
+      "resolved_model": "cx/gpt-5.6-luna",
+      "status": "fail",
+      "summary": "No prompt-cache hit after 3 tries (1864 input tokens, no tools). usage.cached_tokens stayed 0.",
+      "http_status": 200,
+      "latency_ms": 2087.7,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7",
+        "cached_tokens": 0,
+        "chunk_count": 4,
+        "usage": {
+          "completion_tokens": 6,
+          "cost": 1e-05,
+          "prompt_tokens": 1864,
+          "total_tokens": 1870
+        },
+        "had_tools": false
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "gpt-5.6-luna",
+      "resolved_model": "cx/gpt-5.6-luna",
+      "status": "info",
+      "summary": "cost=1e-05",
+      "http_status": 200,
+      "latency_ms": 3426.4,
+      "evidence": {
+        "usage": {
+          "cost": 1e-05,
+          "prompt_tokens": 70,
+          "completion_tokens": 18
+        }
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "deepseek-v4-flash",
+      "resolved_model": "cbcn/deepseek-v4-flash",
+      "status": "pass",
+      "summary": "Streamed a tool call named get_weather.",
+      "http_status": 200,
+      "latency_ms": 2736.7,
+      "evidence": {
+        "chunk_count": 30,
+        "empty_name_chunks": 0,
+        "empty_finish_chunks": 0,
+        "names": [
+          "get_weather"
+        ],
+        "last_finish_reason": "tool_calls"
+      }
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "deepseek-v4-flash",
+      "resolved_model": "cbcn/deepseek-v4-flash",
+      "status": "pass",
+      "summary": "Prompt cache hit: 1792 of 1979 input tokens were reused.",
+      "http_status": 200,
+      "latency_ms": 2499.6,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7",
+        "cached_tokens": 1792,
+        "chunk_count": 17,
+        "usage": {
+          "completion_tokens": 15,
+          "cost": 1e-05,
+          "prompt_tokens": 1979,
+          "prompt_tokens_details": {
+            "cached_tokens": 1792
+          },
+          "total_tokens": 2053
+        },
+        "had_tools": false
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "deepseek-v4-flash",
+      "resolved_model": "cbcn/deepseek-v4-flash",
+      "status": "info",
+      "summary": "cost=1e-05",
+      "http_status": 200,
+      "latency_ms": 2133.9,
+      "evidence": {
+        "usage": {
+          "cost": 1e-05,
+          "prompt_tokens": 298,
+          "completion_tokens": 56,
+          "cached_tokens": 128
+        }
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "deepseek-v4-pro",
+      "resolved_model": "ali/deepseek-v4-pro-0813",
+      "status": "fail",
+      "summary": "Not the OpenAI stream shape: 2 tool delta(s) set name to \"\".",
+      "http_status": 200,
+      "latency_ms": 2412.3,
+      "evidence": {
+        "chunk_count": 5,
+        "empty_name_chunks": 2,
+        "empty_finish_chunks": 0,
+        "names": [
+          "get_weather"
+        ],
+        "last_finish_reason": "tool_calls"
+      }
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "deepseek-v4-pro",
+      "resolved_model": "ali/deepseek-v4-pro-0813",
+      "status": "fail",
+      "summary": "No prompt-cache hit after 3 tries (2137 input tokens, no tools). usage.cached_tokens stayed 0.",
+      "http_status": 200,
+      "latency_ms": 1955.2,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7",
+        "cached_tokens": 0,
+        "chunk_count": 9,
+        "usage": {
+          "completion_tokens": 12,
+          "cost": 3.58545e-05,
+          "prompt_tokens": 2137,
+          "total_tokens": 2149
+        },
+        "had_tools": false
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "deepseek-v4-pro",
+      "resolved_model": "ali/deepseek-v4-pro-0813",
+      "status": "info",
+      "summary": "cost=1e-05",
+      "http_status": 200,
+      "latency_ms": 2189.8,
+      "evidence": {
+        "usage": {
+          "cost": 1e-05,
+          "prompt_tokens": 101,
+          "completion_tokens": 9
+        }
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "qwen3.8-max",
+      "resolved_model": "ali/qwen3.8-max",
+      "status": "pass",
+      "summary": "Streamed a tool call named get_weather.",
+      "http_status": 200,
+      "latency_ms": 2245.9,
+      "evidence": {
+        "chunk_count": 9,
+        "empty_name_chunks": 0,
+        "empty_finish_chunks": 0,
+        "names": [
+          "get_weather"
+        ],
+        "last_finish_reason": "tool_calls"
+      }
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "qwen3.8-max",
+      "resolved_model": "ali/qwen3.8-max",
+      "status": "pass",
+      "summary": "Prompt cache hit: 2048 of 2236 input tokens were reused.",
+      "http_status": 200,
+      "latency_ms": 2901.2,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7",
+        "cached_tokens": 2048,
+        "chunk_count": 15,
+        "usage": {
+          "completion_tokens": 34,
+          "cost": 1e-05,
+          "prompt_tokens": 2236,
+          "prompt_tokens_details": {
+            "cached_tokens": 2048
+          },
+          "total_tokens": 2270
+        },
+        "had_tools": false
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "qwen3.8-max",
+      "resolved_model": "ali/qwen3.8-max",
+      "status": "info",
+      "summary": "cost=1e-05",
+      "http_status": 200,
+      "latency_ms": 2042.2,
+      "evidence": {
+        "usage": {
+          "cost": 1e-05,
+          "prompt_tokens": 290,
+          "completion_tokens": 22
+        }
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "glm-5.3",
+      "resolved_model": "cb/glm-5.3",
+      "status": "pass",
+      "summary": "Streamed a tool call named get_weather.",
+      "http_status": 200,
+      "latency_ms": 1817.6,
+      "evidence": {
+        "chunk_count": 9,
+        "empty_name_chunks": 0,
+        "empty_finish_chunks": 0,
+        "names": [
+          "get_weather"
+        ],
+        "last_finish_reason": "tool_calls"
+      }
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "glm-5.3",
+      "resolved_model": "cb/glm-5.3",
+      "status": "pass",
+      "summary": "Prompt cache hit: 1920 of 1911 input tokens were reused.",
+      "http_status": 200,
+      "latency_ms": 1891.2,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7",
+        "cached_tokens": 1920,
+        "chunk_count": 4,
+        "usage": {
+          "completion_tokens": 4,
+          "cost": 1e-05,
+          "prompt_tokens": 1911,
+          "prompt_tokens_details": {
+            "cached_tokens": 1920
+          },
+          "total_tokens": 1974
+        },
+        "had_tools": false
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "glm-5.3",
+      "resolved_model": "cb/glm-5.3",
+      "status": "info",
+      "summary": "cost=1e-05",
+      "http_status": 200,
+      "latency_ms": 2169.7,
+      "evidence": {
+        "usage": {
+          "cost": 1e-05,
+          "prompt_tokens": 162,
+          "completion_tokens": 12,
+          "cached_tokens": 205
+        }
+      }
+    },
+    {
+      "check_id": "stream_tools",
+      "alias": "grok-4.6",
+      "resolved_model": "",
+      "status": "error",
+      "summary": "HTTP 503: {\"error\":{\"message\":\"all providers for alias 'grok-4.6' failed\",\"type\":\"all_providers_failed\"}} ",
+      "http_status": 503,
+      "latency_ms": 504.8,
+      "evidence": {}
+    },
+    {
+      "check_id": "cache_tools",
+      "alias": "grok-4.6",
+      "resolved_model": "grok-4.6",
+      "status": "error",
+      "summary": "HTTP 503: {\"error\":{\"message\":\"all providers for alias 'grok-4.6' failed\",\"type\":\"all_providers_failed\"}} ",
+      "http_status": 503,
+      "latency_ms": 523.1,
+      "evidence": {
+        "prefix_hash": "6879cf35bed7"
+      }
+    },
+    {
+      "check_id": "usage_pricing",
+      "alias": "grok-4.6",
+      "resolved_model": "grok-4.6",
+      "status": "info",
+      "summary": "HTTP 503: {\"error\":{\"message\":\"all providers for alias 'grok-4.6' failed\",\"type\":\"all_providers_failed\"}} ",
+      "http_status": 503,
+      "latency_ms": 682.1,
+      "evidence": {
+        "usage": {}
+      }
+    }
+  ],
+  "runner_errors": []
+}
